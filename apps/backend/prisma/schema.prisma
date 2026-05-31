@@ -11,10 +11,12 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
+  password  String
   role      Role     @default(BUYER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   orders    Order[]
+  seller    Seller?
 }
 
 enum Role {
@@ -23,28 +25,43 @@ enum Role {
   ADMIN
 }
 
-model Card {
-  id          String   @id @default(cuid())
-  name        String
-  set         String
-  number      String
-  rarity      String
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  skus        CardSku[]
+model Seller {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String    @unique
+  shopName    String    @unique
+  description String?
+  avatar      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  listings    Listing[]
 }
 
-model CardSku {
+model Card {
   id        String    @id @default(cuid())
-  card      Card      @relation(fields: [cardId], references: [id])
-  cardId    String
-  condition Condition
-  price     Decimal   @db.Decimal(10, 2)
-  stock     Int       @default(0)
-  version   Int       @default(0)
+  name      String
+  set       String
+  number    String
+  rarity    String
+  imageUrl  String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  listings  Listing[]
+}
+
+model Listing {
+  id         String      @id @default(cuid())
+  card       Card        @relation(fields: [cardId], references: [id])
+  cardId     String
+  seller     Seller      @relation(fields: [sellerId], references: [id])
+  sellerId   String
+  condition  Condition
+  price      Decimal     @db.Decimal(10, 2)
+  stock      Int         @default(0)
+  version    Int         @default(0)
+  description String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
 }
 
@@ -57,14 +74,14 @@ enum Condition {
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String
-  status     OrderStatus @default(PENDING)
-  total      Decimal     @db.Decimal(10, 2)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  items      OrderItem[]
+  id        String      @id @default(cuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  status    OrderStatus @default(PENDING)
+  total     Decimal     @db.Decimal(10, 2)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  items     OrderItem[]
 }
 
 enum OrderStatus {
@@ -78,11 +95,11 @@ enum OrderStatus {
 }
 
 model OrderItem {
-  id       String  @id @default(cuid())
-  order    Order   @relation(fields: [orderId], references: [id])
-  orderId  String
-  sku      CardSku @relation(fields: [skuId], references: [id])
-  skuId    String
-  quantity Int
-  price    Decimal @db.Decimal(10, 2)
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  listing   Listing @relation(fields: [listingId], references: [id])
+  listingId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
 }

@@ -6,7 +6,7 @@ export default async function cardRoutes(fastify: FastifyInstance) {
   // GET all cards
   fastify.get('/cards', async (request, reply) => {
     const cards = await prisma.card.findMany({
-      include: { skus: true }
+      include: { listings: { include: { seller: true } } }
     })
     return cards
   })
@@ -16,7 +16,7 @@ export default async function cardRoutes(fastify: FastifyInstance) {
     const { id } = request.params
     const card = await prisma.card.findUnique({
       where: { id },
-      include: { skus: true }
+      include: { listings: { include: { seller: true } } }
     })
     if (!card) {
       return reply.status(404).send({ error: 'Card not found' })
@@ -25,15 +25,14 @@ export default async function cardRoutes(fastify: FastifyInstance) {
   })
 
   // POST create a new card
-  fastify.post<{ Body: { name: string; set: string; number: string; rarity: string; imageUrl?: string } }>(
-    '/cards',
-    async (request, reply) => {
-      const { name, set, number, rarity, imageUrl } = request.body
-      const card = await prisma.card.create({
-        data: { name, set, number, rarity, imageUrl }
-      })
-      return reply.status(201).send(card)
-    }
-  )
+  fastify.post<{
+    Body: { name: string; set: string; number: string; rarity: string; imageUrl?: string }
+  }>('/cards', async (request, reply) => {
+    const { name, set, number, rarity, imageUrl } = request.body
+    const card = await prisma.card.create({
+      data: { name, set, number, rarity, imageUrl }
+    })
+    return reply.status(201).send(card)
+  })
 
 }
