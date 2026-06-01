@@ -2,8 +2,8 @@ import { Card } from '../types/card'
 import Image from 'next/image'
 
 export default function CardItem({ card }: { card: Card }) {
-  const lowestPrice = card.skus.length > 0
-    ? Math.min(...card.skus.map(s => parseFloat(s.price)))
+  const lowestPrice = card.listings && card.listings.length > 0
+    ? Math.min(...card.listings.map((l: any) => parseFloat(l.price)))
     : null
 
   return (

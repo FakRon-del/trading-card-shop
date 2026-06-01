@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=256 nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "db:migrate": "dotenv -e .env -- npx prisma migrate dev",
@@ -28,6 +28,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
+    "cross-env": "^10.1.0",
     "dotenv-cli": "^11.0.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",

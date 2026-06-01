@@ -26,9 +26,14 @@ export default async function Home() {
             <h1 className="text-xl font-bold text-white">🃏 Trading Card Shop</h1>
             <p className="text-gray-400 text-xs">Buy & sell trading cards</p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition-colors">
-            Sell Cards
-          </button>
+          <div className="flex items-center gap-3">
+            <a href="/login" className="text-gray-400 hover:text-white text-sm transition-colors">
+              Sign In
+            </a>
+            <a href="/register" className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+              Register
+            </a>
+          </div>
         </div>
       </header>
 

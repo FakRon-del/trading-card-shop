@@ -1,8 +1,11 @@
-export type CardSku = {
+export type Listing = {
   id: string
   condition: string
   price: string
   stock: number
+  seller?: {
+    shopName: string
+  }
 }
 
 export type Card = {
@@ -12,5 +15,5 @@ export type Card = {
   number: string
   rarity: string
   imageUrl: string | null
-  skus: CardSku[]
+  listings: Listing[]
 }
