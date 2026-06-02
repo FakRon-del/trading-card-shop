@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet'
 import dotenv from 'dotenv'
 import cardRoutes from './routes/cards'
 import authRoutes from './routes/auth'
+import sellerRoutes from './routes/seller'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ server.register(helmet)
 // Routes
 server.register(authRoutes, { prefix: '/api' })
 server.register(cardRoutes, { prefix: '/api' })
+server.register(sellerRoutes, { prefix: '/api' })
 
 // Health check
 server.get('/health', async () => {
