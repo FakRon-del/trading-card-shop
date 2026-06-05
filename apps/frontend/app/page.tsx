@@ -28,6 +28,10 @@ export default async function Home() {
             <p className="text-gray-500 text-xs">Buy & sell trading cards</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/cart"
+              className="text-gray-400 hover:text-white text-sm transition-colors">
+              🛒 Cart
+            </Link>
             <Link href="/login"
               className="text-gray-400 hover:text-white text-sm transition-colors">
               Sign In
