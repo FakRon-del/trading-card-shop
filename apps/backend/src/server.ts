@@ -5,22 +5,20 @@ import dotenv from 'dotenv'
 import cardRoutes from './routes/cards'
 import authRoutes from './routes/auth'
 import sellerRoutes from './routes/seller'
+import orderRoutes from './routes/orders'
 
 dotenv.config()
 
 const server = Fastify({ logger: true })
 
-server.register(cors, {
-  origin: 'http://localhost:3000'
-})
+server.register(cors, { origin: 'http://localhost:3000' })
 server.register(helmet)
 
-// Routes
 server.register(authRoutes, { prefix: '/api' })
 server.register(cardRoutes, { prefix: '/api' })
 server.register(sellerRoutes, { prefix: '/api' })
+server.register(orderRoutes, { prefix: '/api' })
 
-// Health check
 server.get('/health', async () => {
   return { status: 'ok', message: 'Trading Card API is running' }
 })
