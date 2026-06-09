@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
 import { getToken, getUser } from '../lib/auth'
+import Link from 'next/link'
 
 type Listing = {
   id: string
@@ -127,6 +128,26 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Quick links */}
+        <div className="grid grid-cols-2 gap-2">
+          <Link href="/dashboard/orders"
+            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 flex items-center gap-2 hover:border-blue-400 transition-colors">
+            <span className="text-lg">📦</span>
+            <div>
+              <p className="text-xs font-medium text-gray-900 dark:text-white">Orders</p>
+              <p className="text-xs text-gray-400">Manage incoming</p>
+            </div>
+          </Link>
+          <Link href={`/shops/${shop?.shopName}`}
+            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 flex items-center gap-2 hover:border-blue-400 transition-colors">
+            <span className="text-lg">🏪</span>
+            <div>
+              <p className="text-xs font-medium text-gray-900 dark:text-white">My Shop</p>
+              <p className="text-xs text-gray-400">Public page</p>
+            </div>
+          </Link>
         </div>
 
         {/* Listings header */}

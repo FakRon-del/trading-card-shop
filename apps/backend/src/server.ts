@@ -11,7 +11,10 @@ dotenv.config()
 
 const server = Fastify({ logger: true })
 
-server.register(cors, { origin: 'http://localhost:3000' })
+server.register(cors, {
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+})
 server.register(helmet)
 
 server.register(authRoutes, { prefix: '/api' })
