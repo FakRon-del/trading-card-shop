@@ -7,6 +7,7 @@ import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
 import { getToken, getUser } from '../../lib/auth'
 
+
 const STATUS_OPTIONS = ['PENDING','PAID','SHIPPED','DELIVERED','CANCELLED']
 
 const STATUS_STYLES: Record<string, string> = {

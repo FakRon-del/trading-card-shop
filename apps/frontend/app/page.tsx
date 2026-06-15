@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
 import { Card } from './types/card'
@@ -120,7 +120,7 @@ export default async function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5">
-              {cards.map((card: any) => {
+              {cards.filter((card: any) => card.listings && card.listings.length > 0).map((card: any) => {
                 const lowestPrice = card.listings?.length > 0
                   ? Math.min(...card.listings.map((l: any) => parseFloat(l.price)))
                   : null
@@ -134,15 +134,10 @@ export default async function Home() {
                       {/* Card image */}
                       <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
                         {card.imageUrl ? (
-                          <Image
-                            src={card.imageUrl}
-                            alt={card.name}
-                            fill
-                            className="object-contain p-1.5"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl">🃏</div>
-                        )}
+                        <img src={card.imageUrl} alt={card.name} className="w-full h-full object-contain p-1.5" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-3xl">🃏</div>
+                      )}
                       </div>
 
                       {/* Card info */}

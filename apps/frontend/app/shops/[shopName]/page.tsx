@@ -1,4 +1,4 @@
-import Image from 'next/image'
+
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
@@ -140,11 +140,10 @@ export default async function ShopPage({
                       {/* Image */}
                       <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
                         {listing.card?.imageUrl ? (
-                          <Image
+                          <img
                             src={listing.card.imageUrl}
                             alt={listing.card.name}
-                            fill
-                            className="object-contain p-1.5"
+                            className="w-full h-full object-contain p-1.5"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-3xl">🃏</div>

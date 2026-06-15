@@ -1,5 +1,5 @@
 import { Card } from '../types/card'
-import Image from 'next/image'
+
 
 export default function CardItem({ card }: { card: Card }) {
   const lowestPrice = card.listings && card.listings.length > 0
@@ -12,16 +12,13 @@ export default function CardItem({ card }: { card: Card }) {
       {/* Card Image */}
       <div className="relative w-full aspect-[3/4] bg-gray-800">
         {card.imageUrl ? (
-          <Image
+          <img
             src={card.imageUrl}
             alt={card.name}
-            fill
-            className="object-contain p-2"
+            className="w-full h-full object-contain p-1.5"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-600 text-sm">
-            No Image
-          </div>
+          <div className="w-full h-full flex items-center justify-center text-2xl">🃏</div>
         )}
       </div>
 

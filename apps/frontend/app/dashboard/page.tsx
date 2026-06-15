@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
 import { getToken, getUser } from '../lib/auth'
 import Link from 'next/link'
+import ImageUpload from '../components/ImageUpload'
 
 type Listing = {
   id: string
@@ -193,13 +194,10 @@ export default function DashboardPage() {
                 ))}
               </div>
 
-              <div>
-                <label className="text-xs text-gray-400 block mb-1">Image URL (optional)</label>
-                <input
+              <div className="col-span-2">
+                <ImageUpload
                   value={form.imageUrl}
-                  onChange={e => setForm(p => ({ ...p, imageUrl: e.target.value }))}
-                  className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none"
-                  placeholder="https://..."
+                  onChange={(url) => setForm(p => ({ ...p, imageUrl: url }))}
                 />
               </div>
 

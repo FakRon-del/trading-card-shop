@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
@@ -79,7 +78,7 @@ export default function CartPage() {
                 {/* Image */}
                 <div className="relative w-12 h-16 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
                   {item.imageUrl ? (
-                    <Image src={item.imageUrl} alt={item.cardName} fill className="object-contain p-0.5" />
+                    <img src={item.imageUrl} alt={item.cardName} className="w-full h-full object-contain p-0.5" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-lg">🃏</div>
                   )}

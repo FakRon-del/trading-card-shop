@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
 import AddToCartButton from '../../components/AddToCartButton'
@@ -72,13 +71,17 @@ export default async function CardDetailPage({
           <div className="flex gap-4 p-4">
 
             {/* Image */}
-            <div className="relative w-32 flex-shrink-0 aspect-[3/4] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
-              {card.imageUrl ? (
-                <Image src={card.imageUrl} alt={card.name} fill className="object-contain p-1" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl">🃏</div>
-              )}
-            </div>
+              <div className="relative w-32 flex-shrink-0 aspect-[3/4] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
+                {card.imageUrl ? (
+                  <img
+                    src={card.imageUrl}
+                    alt={card.name}
+                    className="w-full h-full object-contain p-1"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-3xl">🃏</div>
+                )}
+              </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0 py-1">

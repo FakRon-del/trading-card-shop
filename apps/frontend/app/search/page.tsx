@@ -35,7 +35,7 @@ export default function SearchPage() {
   }, [])
 
   useEffect(() => {
-    let results = cards
+    results = results.filter((c: any) => c.listings && c.listings.length > 0)
 
     if (category !== 'All') {
       results = results.filter(c =>
