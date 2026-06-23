@@ -24,34 +24,74 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/cards')
-      .then(r => r.json())
-      .then(data => {
-        setCards(data)
-        setFiltered(data)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get('q') || ''
+    const cat = params.get('category') || 'All'
+    if (q) setQuery(q)
+    if (cat !== 'All') setCategory(cat)
   }, [])
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get('q') || ''
+    const cat = params.get('category') || 'All'
+    if (q) setQuery(q)
+    if (cat !== 'All') setCategory(cat)
+  }, [])
+
+  useEffect(() => {
+    let results = [...cards]
+
+    // Filter out cards with no listings
     results = results.filter((c: any) => c.listings && c.listings.length > 0)
 
+    // Category filter — match against set name OR card name
     if (category !== 'All') {
-      results = results.filter(c =>
-        c.set?.toLowerCase().includes(category.toLowerCase()) ||
-        c.name?.toLowerCase().includes(category.toLowerCase())
-      )
+      const cat = category.toLowerCase()
+      results = results.filter((c: any) => {
+        const setName = c.set?.toLowerCase() ?? ''
+        const cardName = c.name?.toLowerCase() ?? ''
+        // Map category to known keywords
+        const keywords: Record<string, string[]> = {
+          'pokemon':   ['pokemon', 'poke', 'pikachu', 'charizard', 'base set', 'scarlet', 'violet', 'sword', 'shield', 'sun', 'moon'],
+          'mtg':       ['magic', 'mtg', 'gathering', 'commander', 'standard', 'alpha', 'beta', 'lotus'],
+          'yu-gi-oh':  ['yugioh', 'yu-gi-oh', 'ygo', 'duel', 'monster', 'lob', 'mrd'],
+          'one piece': ['one piece', 'luffy', 'zoro', 'nami', 'op-'],
+          'vanguard':  ['vanguard', 'cardfight'],
+          'digimon':   ['digimon', 'digi'],
+        }
+        const matchWords = keywords[cat] ?? [cat]
+        return matchWords.some(w => setName.includes(w) || cardName.includes(w))
+      })
     }
 
+    // Text search — search name, set, rarity, number AND seller shop name
     if (query.trim()) {
       const q = query.toLowerCase()
-      results = results.filter(c =>
-        c.name?.toLowerCase().includes(q) ||
-        c.set?.toLowerCase().includes(q) ||
-        c.rarity?.toLowerCase().includes(q) ||
-        c.number?.toLowerCase().includes(q)
-      )
+      results = results.filter((c: any) => {
+        const inCard = (
+          c.name?.toLowerCase().includes(q) ||
+          c.set?.toLowerCase().includes(q) ||
+          c.rarity?.toLowerCase().includes(q) ||
+          c.number?.toLowerCase().includes(q)
+        )
+        const inSeller = c.listings?.some((l: any) =>
+          l.seller?.shopName?.toLowerCase().includes(q)
+        )
+        // Match game brand keywords too
+        const brandMap: Record<string, string[]> = {
+          'pokemon': ['pokemon', 'poke'],
+          'magic':   ['magic', 'mtg'],
+          'yugioh':  ['yugioh', 'yu-gi-oh', 'ygo'],
+          'one piece': ['one piece'],
+          'digimon': ['digimon'],
+        }
+        const inBrand = Object.entries(brandMap).some(([brand, keywords]) =>
+          keywords.some(k => q.includes(k)) &&
+          (c.set?.toLowerCase().includes(brand) || c.name?.toLowerCase().includes(brand))
+        )
+        return inCard || inSeller || inBrand
+      })
     }
 
     setFiltered(results)

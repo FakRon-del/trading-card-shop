@@ -7,8 +7,12 @@ import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
 
 export default function AccountPage() {
+  
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [upgrading, setUpgrading] = useState(false)
+  const [upgraded, setUpgraded] = useState(false)
+  
 
   useEffect(() => {
     const u = localStorage.getItem('user')
@@ -102,6 +106,52 @@ export default function AccountPage() {
             </Link>
           ))}
         </div>
+
+        {/* Upgrade to seller */}
+        {user.role === 'BUYER' && !upgraded && (
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">🚀</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Become a Seller</p>
+                <p className="text-xs text-gray-400">Start listing your cards on TradingPlus</p>
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                setUpgrading(true)
+                try {
+                  const res = await fetch('http://localhost:4000/api/seller/upgrade', {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                  })
+                  if (res.ok) {
+                    const updatedUser = { ...user, role: 'SELLER' }
+                    localStorage.setItem('user', JSON.stringify(updatedUser))
+                    setUser(updatedUser)
+                    setUpgraded(true)
+                  }
+                } finally {
+                  setUpgrading(false)
+                }
+              }}
+              disabled={upgrading}
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">
+              {upgrading ? 'Upgrading...' : 'Upgrade to Seller — Free'}
+            </button>
+          </div>
+        )}
+
+        {upgraded && (
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 text-center">
+            <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-1">🎉 You are now a seller!</p>
+            <p className="text-xs text-green-600 dark:text-green-500 mb-3">Set up your shop to start listing cards.</p>
+            <a href="/dashboard/setup"
+              className="text-xs bg-blue-500 text-white px-4 py-2 rounded-lg inline-block">
+              Set Up My Shop
+            </a>
+          </div>
+        )}
 
         {/* Support */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">

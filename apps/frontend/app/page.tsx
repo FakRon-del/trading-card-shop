@@ -1,5 +1,5 @@
 import Link from 'next/link'
-
+import HomeSearch from './components/HomeSearch'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
 import { Card } from './types/card'
@@ -14,17 +14,6 @@ async function getCards(): Promise<Card[]> {
   }
 }
 
-const ACCESSORIES = [
-  { emoji: '🗂️', label: 'Sleeves' },
-  { emoji: '📚', label: 'Binders' },
-  { emoji: '📦', label: 'Booster Boxes' },
-  { emoji: '🏆', label: 'Graded Cards' },
-  { emoji: '🛡️', label: 'Top Loaders' },
-  { emoji: '🎁', label: 'Gift Sets' },
-  { emoji: '🖼️', label: 'Frames' },
-  { emoji: '🧰', label: 'Supplies' },
-]
-
 const RARITY_STYLES: Record<string, string> = {
   'Holo Rare':  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   'Ultra Rare': 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
@@ -33,8 +22,6 @@ const RARITY_STYLES: Record<string, string> = {
   'Uncommon':   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
 }
 
-const CATEGORIES = ['All','Pokemon','MTG','Yu-Gi-Oh','One Piece','Vanguard','Digimon']
-
 export default async function Home() {
   const cards = await getCards()
 
@@ -42,33 +29,7 @@ export default async function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
       <Navbar />
 
-      {/* Search + categories bar */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-2.5">
-        <div className="max-w-5xl mx-auto space-y-2">
-
-          {/* Search */}
-          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            <span className="text-xs text-gray-400">Search cards, sets, sellers...</span>
-          </div>
-
-          {/* Category pills */}
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{scrollbarWidth:'none'}}>
-            {CATEGORIES.map((cat, i) => (
-              <button key={cat}
-                className={`text-xs px-3 py-1 rounded-full whitespace-nowrap border flex-shrink-0 transition-colors ${
-                  i === 0
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'
-                }`}>
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <HomeSearch />
 
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-4 py-4 space-y-6">
@@ -82,10 +43,7 @@ export default async function Home() {
             <p className="text-xs text-gray-400 mb-3">
               Verified sellers across the Philippines
             </p>
-            <Link href="/register"
-              className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg transition-colors inline-block">
-              Start selling →
-            </Link>
+            
           </div>
           <div className="grid grid-cols-2 gap-1.5 flex-shrink-0">
             {['🔥','⚡','🌑','💧'].map(e => (
@@ -166,23 +124,6 @@ export default async function Home() {
               })}
             </div>
           )}
-        </div>
-
-        {/* Accessories */}
-        <div>
-          <div className="flex items-center justify-between mb-2.5">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Accessories</h3>
-            <span className="text-xs text-blue-500">Browse all →</span>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-            {ACCESSORIES.map(acc => (
-              <button key={acc.label}
-                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-2.5 flex flex-col items-center gap-1.5 hover:border-blue-400 transition-colors">
-                <span className="text-xl">{acc.emoji}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 text-center leading-tight">{acc.label}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
       </div>

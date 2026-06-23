@@ -115,9 +115,19 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
     const seller = await prisma.seller.findUnique({ where: { userId: user.userId } })
     if (!seller) return reply.status(404).send({ error: 'Shop not found' })
 
-    const listing = await prisma.listing.findUnique({ where: { id: request.params.id } })
+    const listing = await prisma.listing.findUnique({
+      where: { id: request.params.id },
+      include: { orderItems: true }
+    })
     if (!listing) return reply.status(404).send({ error: 'Listing not found' })
     if (listing.sellerId !== seller.id) return reply.status(403).send({ error: 'Not your listing' })
+
+    // Block deletion if listing has been ordered
+    if (listing.orderItems.length > 0) {
+      return reply.status(400).send({
+        error: 'This card cannot be removed because it has been purchased by a buyer. You can set the stock to 0 instead.'
+      })
+    }
 
     await prisma.listing.delete({ where: { id: request.params.id } })
     return { success: true }
@@ -137,5 +147,18 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
     })
     if (!seller) return reply.status(404).send({ error: 'Shop not found' })
     return seller
+  })
+
+  // PATCH - Upgrade buyer to seller
+  fastify.patch('/seller/upgrade', async (request, reply) => {
+    const user = getUser(request)
+    if (!user) return reply.status(401).send({ error: 'Unauthorized' })
+
+    await prisma.user.update({
+      where: { id: user.userId },
+      data: { role: 'SELLER' }
+    })
+
+    return { success: true, message: 'Account upgraded to seller' }
   })
 }

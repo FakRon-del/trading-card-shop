@@ -83,10 +83,15 @@ export default function DashboardPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Remove this listing?')) return
-    await fetch(`http://localhost:4000/api/seller/listings/${id}`, {
+    const res = await fetch(`http://localhost:4000/api/seller/listings/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
+    const data = await res.json()
+    if (!res.ok) {
+      alert(`❌ ${data.error}`)
+      return
+    }
     fetchShop()
   }
 
