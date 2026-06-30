@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import BottomNav from '../components/BottomNav'
 import Navbar from '../components/Navbar'
+import BottomNav from '../components/BottomNav'
 
 const CATEGORIES = ['All', 'Pokemon', 'MTG', 'Yu-Gi-Oh', 'One Piece', 'Vanguard', 'Digimon']
 
@@ -16,96 +15,106 @@ const RARITY_STYLES: Record<string, string> = {
   'Uncommon':   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
 }
 
+const BRAND_KEYWORDS: Record<string, string[]> = {
+  'pokemon':   ['pokemon', 'poke', 'base set', 'scarlet', 'violet', 'sword', 'shield'],
+  'mtg':       ['magic', 'mtg', 'gathering', 'commander', 'alpha', 'beta'],
+  'yu-gi-oh':  ['yugioh', 'yu-gi-oh', 'ygo', 'duel', 'lob', 'mrd'],
+  'one piece': ['one piece', 'luffy', 'op-'],
+  'vanguard':  ['vanguard', 'cardfight'],
+  'digimon':   ['digimon', 'digi'],
+}
+
 export default function SearchPage() {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [cards, setCards] = useState<any[]>([])
   const [filtered, setFiltered] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Load cards once on mount
   useEffect(() => {
+    // Read URL params
     const params = new URLSearchParams(window.location.search)
     const q = params.get('q') || ''
     const cat = params.get('category') || 'All'
-    if (q) setQuery(q)
+    if (q) { setQuery(q); setDebouncedQuery(q) }
     if (cat !== 'All') setCategory(cat)
+
+    fetch('http://localhost:4000/api/cards')
+      .then(r => r.json())
+      .then(data => {
+        const withListings = data.filter((c: any) => c.listings?.length > 0)
+        setCards(withListings)
+        setFiltered(withListings)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
   }, [])
 
+  // Debounce query — wait 200ms after user stops typing
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const q = params.get('q') || ''
-    const cat = params.get('category') || 'All'
-    if (q) setQuery(q)
-    if (cat !== 'All') setCategory(cat)
-  }, [])
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query)
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [query])
 
-  useEffect(() => {
+  // Filter whenever debounced query or category changes
+  const filterCards = useCallback(() => {
     let results = [...cards]
 
-    // Filter out cards with no listings
-    results = results.filter((c: any) => c.listings && c.listings.length > 0)
-
-    // Category filter — match against set name OR card name
+    // Category filter
     if (category !== 'All') {
       const cat = category.toLowerCase()
+      const keywords = BRAND_KEYWORDS[cat] ?? [cat]
       results = results.filter((c: any) => {
         const setName = c.set?.toLowerCase() ?? ''
-        const cardName = c.name?.toLowerCase() ?? ''
-        // Map category to known keywords
-        const keywords: Record<string, string[]> = {
-          'pokemon':   ['pokemon', 'poke', 'pikachu', 'charizard', 'base set', 'scarlet', 'violet', 'sword', 'shield', 'sun', 'moon'],
-          'mtg':       ['magic', 'mtg', 'gathering', 'commander', 'standard', 'alpha', 'beta', 'lotus'],
-          'yu-gi-oh':  ['yugioh', 'yu-gi-oh', 'ygo', 'duel', 'monster', 'lob', 'mrd'],
-          'one piece': ['one piece', 'luffy', 'zoro', 'nami', 'op-'],
-          'vanguard':  ['vanguard', 'cardfight'],
-          'digimon':   ['digimon', 'digi'],
-        }
-        const matchWords = keywords[cat] ?? [cat]
-        return matchWords.some(w => setName.includes(w) || cardName.includes(w))
+        const name = c.name?.toLowerCase() ?? ''
+        return keywords.some(k => setName.includes(k) || name.includes(k))
       })
     }
 
-    // Text search — search name, set, rarity, number AND seller shop name
-    if (query.trim()) {
-      const q = query.toLowerCase()
+    // Text search
+    if (debouncedQuery.trim()) {
+      const q = debouncedQuery.toLowerCase()
       results = results.filter((c: any) => {
-        const inCard = (
+        const inCard =
           c.name?.toLowerCase().includes(q) ||
           c.set?.toLowerCase().includes(q) ||
           c.rarity?.toLowerCase().includes(q) ||
           c.number?.toLowerCase().includes(q)
-        )
         const inSeller = c.listings?.some((l: any) =>
           l.seller?.shopName?.toLowerCase().includes(q)
         )
-        // Match game brand keywords too
-        const brandMap: Record<string, string[]> = {
-          'pokemon': ['pokemon', 'poke'],
-          'magic':   ['magic', 'mtg'],
-          'yugioh':  ['yugioh', 'yu-gi-oh', 'ygo'],
-          'one piece': ['one piece'],
-          'digimon': ['digimon'],
-        }
-        const inBrand = Object.entries(brandMap).some(([brand, keywords]) =>
-          keywords.some(k => q.includes(k)) &&
-          (c.set?.toLowerCase().includes(brand) || c.name?.toLowerCase().includes(brand))
+        const inBrand = Object.entries(BRAND_KEYWORDS).some(([, kws]) =>
+          kws.some(k => q.includes(k)) &&
+          (c.set?.toLowerCase().includes(k) || c.name?.toLowerCase().includes(k))
         )
         return inCard || inSeller || inBrand
       })
     }
 
     setFiltered(results)
-  }, [query, category, cards])
+  }, [cards, category, debouncedQuery])
+
+  useEffect(() => {
+    filterCards()
+  }, [filterCards])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
       <Navbar />
 
-      {/* Search input */}
+      {/* Sticky search bar */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 sticky top-14 z-40">
         <div className="max-w-5xl mx-auto space-y-2">
+
+          {/* Search input */}
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+              strokeLinejoin="round" className="text-gray-400 flex-shrink-0">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
             <input
@@ -113,22 +122,21 @@ export default function SearchPage() {
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search cards, sets, rarity..."
+              placeholder="Search cards, sets, sellers, games..."
               className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none"
             />
             {query && (
               <button onClick={() => setQuery('')}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs">
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs flex-shrink-0">
                 ✕
               </button>
             )}
           </div>
 
-          {/* Category filter */}
+          {/* Category pills */}
           <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{scrollbarWidth:'none'}}>
             {CATEGORIES.map(cat => (
-              <button key={cat}
-                onClick={() => setCategory(cat)}
+              <button key={cat} onClick={() => setCategory(cat)}
                 className={`text-xs px-3 py-1 rounded-full whitespace-nowrap border flex-shrink-0 transition-colors ${
                   category === cat
                     ? 'bg-blue-500 text-white border-blue-500'
@@ -145,14 +153,18 @@ export default function SearchPage() {
 
         {/* Results count */}
         <p className="text-xs text-gray-400 mb-3">
-          {loading ? 'Loading...' : `${filtered.length} results${query ? ` for "${query}"` : ''}`}
+          {loading
+            ? 'Loading cards...'
+            : `${filtered.length} result${filtered.length !== 1 ? 's' : ''}${debouncedQuery ? ` for "${debouncedQuery}"` : ''}`
+          }
         </p>
 
-        {/* Loading */}
+        {/* Skeleton loader */}
         {loading && (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden animate-pulse">
+              <div key={i}
+                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden animate-pulse">
                 <div className="w-full aspect-[3/4] bg-gray-200 dark:bg-gray-800" />
                 <div className="p-2 space-y-1.5">
                   <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
@@ -168,13 +180,16 @@ export default function SearchPage() {
           <div className="text-center py-16">
             <p className="text-3xl mb-3">🔍</p>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              No cards found{query ? ` for "${query}"` : ''}
+              No cards found{debouncedQuery ? ` for "${debouncedQuery}"` : ''}
             </p>
-            <p className="text-xs text-gray-400 mt-1">Try a different name or set</p>
-            {query && (
-              <button onClick={() => setQuery('')}
+            <p className="text-xs text-gray-400 mt-1">
+              Try searching by card name, set, or game (e.g. "Pokemon")
+            </p>
+            {(debouncedQuery || category !== 'All') && (
+              <button
+                onClick={() => { setQuery(''); setCategory('All') }}
                 className="mt-4 text-xs text-blue-500 hover:text-blue-600">
-                Clear search
+                Clear filters
               </button>
             )}
           </div>
@@ -195,7 +210,12 @@ export default function SearchPage() {
                   <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all">
                     <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
                       {card.imageUrl ? (
-                        <Image src={card.imageUrl} alt={card.name} fill className="object-contain p-1.5" />
+                        <img
+                          src={card.imageUrl}
+                          alt={card.name}
+                          className="w-full h-full object-contain p-1.5"
+                          loading="lazy"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-2xl">🃏</div>
                       )}

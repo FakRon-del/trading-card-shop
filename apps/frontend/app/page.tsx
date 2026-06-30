@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import HomeSearch from './components/HomeSearch'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
+import HomeSearch from './components/HomeSearch'
+import WelcomeRedirect from './components/WelcomeRedirect'
 import { Card } from './types/card'
 
 async function getCards(): Promise<Card[]> {
@@ -27,6 +28,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
+      <WelcomeRedirect />
       <Navbar />
 
       <HomeSearch />

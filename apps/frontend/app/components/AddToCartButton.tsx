@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   listing: {
@@ -17,21 +18,25 @@ type Props = {
 }
 
 export default function AddToCartButton({ listing, card }: Props) {
+  const router = useRouter()
   const [added, setAdded] = useState(false)
 
   const handleAddToCart = () => {
-    // Get existing cart from localStorage
+    // Check if logged in
+    const user = localStorage.getItem('user')
+    if (!user) {
+      router.push('/register')
+      return
+    }
+
+    // Get existing cart
     const existing = localStorage.getItem('cart')
     const cart = existing ? JSON.parse(existing) : []
 
-    // Check if already in cart
     const index = cart.findIndex((item: any) => item.listingId === listing.id)
-
     if (index > -1) {
-      // Increase quantity
       cart[index].quantity += 1
     } else {
-      // Add new item
       cart.push({
         listingId: listing.id,
         cardName: card.name,
@@ -43,8 +48,6 @@ export default function AddToCartButton({ listing, card }: Props) {
     }
 
     localStorage.setItem('cart', JSON.stringify(cart))
-
-    // Show feedback
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }
@@ -53,14 +56,13 @@ export default function AddToCartButton({ listing, card }: Props) {
     <button
       onClick={handleAddToCart}
       disabled={listing.stock === 0}
-      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex-shrink-0 ${
         added
-          ? 'bg-green-600 text-white'
+          ? 'bg-green-500 text-white'
           : listing.stock === 0
-          ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-          : 'bg-blue-600 hover:bg-blue-500 text-white'
-      }`}
-    >
+          ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+          : 'bg-blue-500 hover:bg-blue-600 text-white'
+      }`}>
       {added ? '✓ Added!' : listing.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
     </button>
   )

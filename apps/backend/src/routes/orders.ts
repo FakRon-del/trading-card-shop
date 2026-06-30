@@ -33,7 +33,14 @@ export default async function orderRoutes(fastify: FastifyInstance) {
     for (const item of items) {
       const listing = await prisma.listing.findUnique({ where: { id: item.listingId } })
       if (!listing) return reply.status(404).send({ error: 'Listing not found' })
-      if (listing.stock < item.quantity) return reply.status(400).send({ error: 'Not enough stock' })
+      if (item.quantity < 1) {
+        return reply.status(400).send({ error: `Invalid quantity for ${listing.id}` })
+      }
+      if (item.quantity > listing.stock) {
+        return reply.status(400).send({ 
+          error: `Only ${listing.stock} unit${listing.stock === 1 ? '' : 's'} available` 
+        })
+      }
       total += parseFloat(listing.price.toString()) * item.quantity
       resolvedItems.push({ listing, quantity: item.quantity })
     }

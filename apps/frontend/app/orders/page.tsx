@@ -29,11 +29,12 @@ export default function OrdersPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isGuest, setIsGuest] = useState(false)
+
 
   useEffect(() => {
     const user = getUser()
-    if (!user) { router.push('/login'); return }
-
+    if (!user) { setIsGuest(true); setLoading(false); return }
     fetch('http://localhost:4000/api/orders/my', {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
@@ -47,6 +48,28 @@ export default function OrdersPage() {
       <Navbar />
 
       <div className="max-w-lg mx-auto px-4 py-5">
+        {/* Guest view */}
+        {isGuest && (
+          <div className="text-center py-20">
+            <p className="text-4xl mb-3">📦</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Sign in to view your orders
+            </p>
+            <p className="text-xs text-gray-400 mt-1 mb-5">
+              Track your purchases and order history
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link href="/login"
+                className="text-xs bg-blue-500 text-white px-5 py-2 rounded-lg inline-block">
+                Sign In
+              </Link>
+              <Link href="/register"
+                className="text-xs border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 px-5 py-2 rounded-lg inline-block">
+                Register
+              </Link>
+            </div>
+          </div>
+        )}
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">My Orders</h2>
 
         {loading && (

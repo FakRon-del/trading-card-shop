@@ -10,13 +10,17 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const cart = localStorage.getItem('cart')
-    if (cart) {
-      const items = JSON.parse(cart)
-      setCartCount(items.reduce((sum: number, i: any) => sum + i.quantity, 0))
+    try {
+      const cart = localStorage.getItem('cart')
+      if (cart) {
+        const items = JSON.parse(cart)
+        setCartCount(items.reduce((sum: number, i: any) => sum + i.quantity, 0))
+      }
+      const u = localStorage.getItem('user')
+      if (u) setUser(JSON.parse(u))
+    } catch {
+      // localStorage not available
     }
-    const u = localStorage.getItem('user')
-    if (u) setUser(JSON.parse(u))
   }, [])
 
   const logout = () => {

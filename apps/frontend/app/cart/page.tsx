@@ -20,8 +20,10 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([])
 
   useEffect(() => {
-    const stored = localStorage.getItem('cart')
-    if (stored) setCart(JSON.parse(stored))
+    try {
+      const stored = localStorage.getItem('cart')
+      if (stored) setCart(JSON.parse(stored))
+    } catch {}
   }, [])
 
   const update = (listingId: string, delta: number) => {
