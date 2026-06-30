@@ -15,6 +15,15 @@ async function getCards(): Promise<Card[]> {
   }
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  SINGLE_CARD: '🃏',
+  BOOSTER_BOX: '📦',
+  SLEEVES: '🗂️',
+  TOPLOADER: '🛡️',
+  ACRYLIC_CASE: '🔲',
+  FRAME: '🖼️',
+}
+
 const RARITY_STYLES: Record<string, string> = {
   'Holo Rare':  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   'Ultra Rare': 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
@@ -102,7 +111,9 @@ export default async function Home() {
 
                       {/* Card info */}
                       <div className="p-2">
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{card.name}</p>
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+                          {CATEGORY_LABELS[card.category]} {card.name}
+                        </p>
                         <p className="text-xs text-gray-400 truncate mb-1.5">{card.set}</p>
                         <span className={`text-xs px-1.5 py-0.5 rounded-full ${rarityStyle}`}>
                           {card.rarity}

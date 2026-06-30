@@ -38,15 +38,25 @@ model Seller {
 }
 
 model Card {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   name      String
   set       String
   number    String
   rarity    String
+  category  Category    @default(SINGLE_CARD)
   imageUrl  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   listings  Listing[]
+}
+
+enum Category {
+  SINGLE_CARD
+  BOOSTER_BOX
+  SLEEVES
+  TOPLOADER
+  ACRYLIC_CASE
+  FRAME
 }
 
 model Listing {

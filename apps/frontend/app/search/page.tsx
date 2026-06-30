@@ -5,8 +5,16 @@ import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
 
-const CATEGORIES = ['All', 'Pokemon', 'MTG', 'Yu-Gi-Oh', 'One Piece', 'Vanguard', 'Digimon']
+const CATEGORIES = ['All', 'Cards', 'Booster Box', 'Sleeves', 'Top Loader', 'Acrylic Case', 'Frame']
 
+const CATEGORY_MAP: Record<string, string> = {
+  'Cards': 'SINGLE_CARD',
+  'Booster Box': 'BOOSTER_BOX',
+  'Sleeves': 'SLEEVES',
+  'Top Loader': 'TOPLOADER',
+  'Acrylic Case': 'ACRYLIC_CASE',
+  'Frame': 'FRAME',
+}
 const RARITY_STYLES: Record<string, string> = {
   'Holo Rare':  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   'Ultra Rare': 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
@@ -64,17 +72,13 @@ export default function SearchPage() {
   const filterCards = useCallback(() => {
     let results = [...cards]
 
-    // Category filter
+    // Category filter — match against product category
     if (category !== 'All') {
-      const cat = category.toLowerCase()
-      const keywords = BRAND_KEYWORDS[cat] ?? [cat]
-      results = results.filter((c: any) => {
-        const setName = c.set?.toLowerCase() ?? ''
-        const name = c.name?.toLowerCase() ?? ''
-        return keywords.some(k => setName.includes(k) || name.includes(k))
-      })
+      const dbCategory = CATEGORY_MAP[category]
+      if (dbCategory) {
+        results = results.filter((c: any) => c.category === dbCategory)
+      }
     }
-
     // Text search
     if (debouncedQuery.trim()) {
       const q = debouncedQuery.toLowerCase()
@@ -87,11 +91,7 @@ export default function SearchPage() {
         const inSeller = c.listings?.some((l: any) =>
           l.seller?.shopName?.toLowerCase().includes(q)
         )
-        const inBrand = Object.entries(BRAND_KEYWORDS).some(([, kws]) =>
-          kws.some(k => q.includes(k)) &&
-          (c.set?.toLowerCase().includes(k) || c.name?.toLowerCase().includes(k))
-        )
-        return inCard || inSeller || inBrand
+        return inCard || inSeller
       })
     }
 

@@ -3,6 +3,7 @@ export type Listing = {
   condition: string
   price: string
   stock: number
+  description?: string
   seller?: {
     shopName: string
   }
@@ -14,6 +15,7 @@ export type Card = {
   set: string
   number: string
   rarity: string
+  category: string
   imageUrl: string | null
   listings: Listing[]
 }

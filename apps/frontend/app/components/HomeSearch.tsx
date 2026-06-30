@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const CATEGORIES = ['All','Pokemon','MTG','Yu-Gi-Oh','One Piece','Vanguard','Digimon']
+const CATEGORIES = ['All', 'Cards', 'Booster Box', 'Sleeves', 'Top Loader', 'Acrylic Case', 'Frame']
 
 export default function HomeSearch() {
   const router = useRouter()

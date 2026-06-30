@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({
-    cardName: '', set: '', number: '', rarity: '',
+    cardName: '', set: '', number: '', rarity: '', category: 'SINGLE_CARD',
     imageUrl: '', condition: 'NEAR_MINT',
     price: '', stock: '1', description: ''
   })
@@ -74,7 +74,7 @@ export default function DashboardPage() {
       })
       const data = await res.json()
       if (!res.ok) { setAddError(data.error || 'Failed'); return }
-      setForm({ cardName: '', set: '', number: '', rarity: '', imageUrl: '', condition: 'NEAR_MINT', price: '', stock: '1', description: '' })
+      setForm({ cardName: '', set: '', number: '', rarity: '', category: 'SINGLE_CARD', imageUrl: '', condition: 'NEAR_MINT', price: '', stock: '1', description: '' })
       setShowForm(false)
       fetchShop()
     } catch { setAddError('Something went wrong.') }
@@ -179,12 +179,27 @@ export default function DashboardPage() {
               </div>
             )}
             <form onSubmit={handleAdd} className="space-y-2.5">
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Product Type</label>
+                <select
+                  value={form.category}
+                  onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+                  className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none">
+                  <option value="SINGLE_CARD">🃏 Single Card</option>
+                  <option value="BOOSTER_BOX">📦 Booster Box</option>
+                  <option value="SLEEVES">🗂️ Sleeves</option>
+                  <option value="TOPLOADER">🛡️ Top Loader</option>
+                  <option value="ACRYLIC_CASE">🔲 Acrylic Case</option>
+                  <option value="FRAME">🖼️ Frame</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-2.5">
                 {[
-                  { key: 'cardName', label: 'Card Name', placeholder: 'Charizard' },
-                  { key: 'set', label: 'Set', placeholder: 'Base Set' },
-                  { key: 'number', label: 'Card Number', placeholder: '4/102' },
-                  { key: 'rarity', label: 'Rarity', placeholder: 'Holo Rare' },
+                  { key: 'cardName', label: form.category === 'SINGLE_CARD' ? 'Card Name' : 'Product Name', placeholder: form.category === 'SINGLE_CARD' ? 'Charizard' : 'Ultra Pro Sleeves' },
+                  { key: 'set', label: form.category === 'SINGLE_CARD' ? 'Set' : 'Brand', placeholder: form.category === 'SINGLE_CARD' ? 'Base Set' : 'Ultra Pro' },
+                  { key: 'number', label: form.category === 'SINGLE_CARD' ? 'Card Number' : 'SKU / Code', placeholder: form.category === 'SINGLE_CARD' ? '4/102' : 'UP-001' },
+                  { key: 'rarity', label: form.category === 'SINGLE_CARD' ? 'Rarity' : 'Variant', placeholder: form.category === 'SINGLE_CARD' ? 'Holo Rare' : 'Standard' },
                 ].map(f => (
                   <div key={f.key}>
                     <label className="text-xs text-gray-400 block mb-1">{f.label}</label>

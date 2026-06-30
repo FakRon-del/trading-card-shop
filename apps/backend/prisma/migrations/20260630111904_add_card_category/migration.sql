@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "Category" AS ENUM ('SINGLE_CARD', 'BOOSTER_BOX', 'SLEEVES', 'TOPLOADER', 'ACRYLIC_CASE', 'FRAME');
+
+-- AlterTable
+ALTER TABLE "Card" ADD COLUMN     "category" "Category" NOT NULL DEFAULT 'SINGLE_CARD';
