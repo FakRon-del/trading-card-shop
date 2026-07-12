@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
 import AddToCartButton from '../../components/AddToCartButton'
+import AvailabilityBadge from '../../components/AvailabilityBadge'
 
 async function getCard(id: string) {
   try {
@@ -128,6 +129,9 @@ export default async function CardDetailPage({
                       <span className="text-xs text-gray-400">
                         · {listing.stock} left
                       </span>
+                    </div>
+                    <div className="mb-1">
+                      <AvailabilityBadge availability={listing.availability} />
                     </div>
                     <p className="text-xs text-gray-400 mb-1">
                       {CONDITION_LABELS[listing.condition] ?? listing.condition}

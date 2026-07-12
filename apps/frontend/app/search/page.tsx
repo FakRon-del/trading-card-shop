@@ -39,6 +39,7 @@ export default function SearchPage() {
   const [cards, setCards] = useState<any[]>([])
   const [filtered, setFiltered] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [availability, setAvailability] = useState('All')
 
   // Load cards once on mount
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function SearchPage() {
 
   // Filter whenever debounced query or category changes
   const filterCards = useCallback(() => {
-    let results = [...cards]
+    let results = [cards, category, availability, debouncedQuery]
 
     // Category filter — match against product category
     if (category !== 'All') {
@@ -78,6 +79,12 @@ export default function SearchPage() {
       if (dbCategory) {
         results = results.filter((c: any) => c.category === dbCategory)
       }
+    }
+    // Availability filter
+    if (availability !== 'All') {
+      results = results.filter((c: any) =>
+        c.listings?.some((l: any) => l.availability === availability)
+      )
     }
     // Text search
     if (debouncedQuery.trim()) {
@@ -149,6 +156,26 @@ export default function SearchPage() {
         </div>
       </div>
 
+      {/* Availability filter */}
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5" style={{scrollbarWidth:'none'}}>
+            {[
+              { value: 'All', label: '🔍 All' },
+              { value: 'ON_HAND', label: '✅ On Hand' },
+              { value: 'PRE_ORDER', label: '⏳ Pre-order' },
+              { value: 'DELIVERED', label: '📦 Delivered' },
+            ].map(opt => (
+              <button key={opt.value}
+                onClick={() => setAvailability(opt.value)}
+                className={`text-xs px-3 py-1 rounded-full whitespace-nowrap border flex-shrink-0 transition-colors ${
+                  availability === opt.value
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 bg-transparent'
+                }`}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
       <div className="max-w-5xl mx-auto px-4 py-4">
 
         {/* Results count */}
@@ -195,18 +222,19 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Results grid */}
+       {/* Results grid */}
         {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5">
-            {filtered.map((card: any) => {
+            {filtered.map((card: any, index: number) => {
               const lowestPrice = card.listings?.length > 0
                 ? Math.min(...card.listings.map((l: any) => parseFloat(l.price)))
                 : null
               const rarityStyle = RARITY_STYLES[card.rarity]
                 ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+              const uniqueKey = card.id ?? `card-${index}`
 
               return (
-                <Link key={card.id} href={`/cards/${card.id}`}>
+                <Link href={`/cards/${card.id}`} key={uniqueKey}>
                   <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all">
                     <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
                       {card.imageUrl ? (

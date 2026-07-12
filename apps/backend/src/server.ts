@@ -8,6 +8,7 @@ import authRoutes from './routes/auth'
 import sellerRoutes from './routes/seller'
 import orderRoutes from './routes/orders'
 import uploadRoutes from './routes/upload'
+import adminRoutes from './routes/admin'
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ server.register(cardRoutes, { prefix: '/api' })
 server.register(sellerRoutes, { prefix: '/api' })
 server.register(orderRoutes, { prefix: '/api' })
 server.register(uploadRoutes, { prefix: '/api' })
+server.register(adminRoutes, { prefix: '/api' })
 
 server.get('/health', async () => {
   return { status: 'ok', message: 'Trading Card API is running' }

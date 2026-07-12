@@ -36,11 +36,13 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center text-white text-sm font-bold">
-            T
-          </div>
-          <span className="font-semibold text-gray-900 dark:text-white text-sm">
-            Trading<span className="text-blue-500">Plus</span>
+          <img
+            src="/logo.png"
+            alt="Booster Hunt TCG"
+            className="w-8 h-8 object-contain"
+          />
+          <span className="font-semibold text-gray-900 dark:text-white text-base">
+            Booster Hunt <span className="text-blue-500">TCG</span>
           </span>
         </Link>
 

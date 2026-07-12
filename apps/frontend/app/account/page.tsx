@@ -114,7 +114,7 @@ export default function AccountPage() {
               <span className="text-2xl">🚀</span>
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">Become a Seller</p>
-                <p className="text-xs text-gray-400">Start listing your cards on TradingPlus</p>
+                <p className="text-xs text-gray-400">Start listing your cards on Booster Hunt TCG</p>
               </div>
             </div>
             <button
@@ -184,7 +184,7 @@ export default function AccountPage() {
         </button>
 
         <p className="text-center text-xs text-gray-400">
-          TradingPlus v1.0 · Made in the Philippines 🇵🇭
+          Booster Hunt TCG v1.0 · Made in the Philippines 🇵🇭
         </p>
       </div>
 

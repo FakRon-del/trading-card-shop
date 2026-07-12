@@ -4,6 +4,7 @@ import BottomNav from './components/BottomNav'
 import HomeSearch from './components/HomeSearch'
 import WelcomeRedirect from './components/WelcomeRedirect'
 import { Card } from './types/card'
+import AvailabilityBadge from './components/AvailabilityBadge'
 
 async function getCards(): Promise<Card[]> {
   try {
@@ -49,11 +50,11 @@ export default async function Home() {
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white leading-snug mb-1">
-              Buy & sell cards.<br />Fast & trusted.
-            </h2>
-            <p className="text-xs text-gray-400 mb-3">
-              Verified sellers across the Philippines
-            </p>
+            On-hand, Pre-order<br />& Delivered cards.
+          </h2>
+          <p className="text-xs text-gray-400 mb-3">
+            Shop verified sellers across the Philippines
+          </p>
             
           </div>
           <div className="grid grid-cols-2 gap-1.5 flex-shrink-0">
@@ -95,9 +96,19 @@ export default async function Home() {
                   : null
                 const rarityStyle = RARITY_STYLES[card.rarity]
                   ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                {(() => {
+                        const cheapest = card.listings?.reduce((a: any, b: any) =>
+                          parseFloat(a.price) < parseFloat(b.price) ? a : b, card.listings[0])
+                        return cheapest ? (
+                          <div className="mt-1">
+                            <AvailabilityBadge availability={cheapest.availability} />
+                          </div>
+                        ) : null
+                      })()}
 
                 return (
-                  <Link key={card.id} href={`/cards/${card.id}`}>
+                  <div key={card.id}>
+                  <Link href={`/cards/${card.id}`}>
                     <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all">
 
                       {/* Card image */}
@@ -132,7 +143,8 @@ export default async function Home() {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                 </Link>
+                  </div>
                 )
               })}
             </div>

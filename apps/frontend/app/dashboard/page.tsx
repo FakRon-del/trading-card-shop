@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({
     cardName: '', set: '', number: '', rarity: '', category: 'SINGLE_CARD',
-    imageUrl: '', condition: 'NEAR_MINT',
+    imageUrl: '', condition: 'NEAR_MINT', availability: 'ON_HAND',
     price: '', stock: '1', description: ''
   })
   const [addLoading, setAddLoading] = useState(false)
@@ -74,7 +74,7 @@ export default function DashboardPage() {
       })
       const data = await res.json()
       if (!res.ok) { setAddError(data.error || 'Failed'); return }
-      setForm({ cardName: '', set: '', number: '', rarity: '', category: 'SINGLE_CARD', imageUrl: '', condition: 'NEAR_MINT', price: '', stock: '1', description: '' })
+      setForm({ cardName: '', set: '', number: '', rarity: '', category: 'SINGLE_CARD', imageUrl: '', condition: 'NEAR_MINT', availability: 'ON_HAND', price: '', stock: '1', description: '' })
       setShowForm(false)
       fetchShop()
     } catch { setAddError('Something went wrong.') }
@@ -222,17 +222,29 @@ export default function DashboardPage() {
               </div>
 
               <div className="grid grid-cols-3 gap-2.5">
-                <div className="col-span-3 sm:col-span-1">
-                  <label className="text-xs text-gray-400 block mb-1">Condition</label>
-                  <select
-                    value={form.condition}
-                    onChange={e => setForm(p => ({ ...p, condition: e.target.value }))}
-                    className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none">
-                    {CONDITIONS.map(c => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <div>
+                <label className="text-xs text-gray-400 block mb-1">Availability</label>
+                <select
+                  value={form.availability}
+                  onChange={e => setForm(p => ({ ...p, availability: e.target.value }))}
+                  className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none">
+                  <option value="ON_HAND">✅ On Hand</option>
+                  <option value="PRE_ORDER">⏳ Pre-order</option>
+                  <option value="DELIVERED">📦 Delivered</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Condition</label>
+                <select
+                  value={form.condition}
+                  onChange={e => setForm(p => ({ ...p, condition: e.target.value }))}
+                  className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none">
+                  {CONDITIONS.map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
                 <div>
                   <label className="text-xs text-gray-400 block mb-1">Price (₱)</label>
                   <input

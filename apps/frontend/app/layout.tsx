@@ -6,8 +6,8 @@ import { ThemeProvider } from './components/ThemeProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TradingPlus — Buy & Sell Trading Cards',
-  description: 'The Philippines premier trading card marketplace. Pokemon, MTG, Yu-Gi-Oh and more.',
+  title: 'Booster Hunt TCG — Buy & Sell Trading Cards Philippines',
+  description: 'Philippines #1 TCG marketplace. Buy & sell Pokemon, MTG, Yu-Gi-Oh, One Piece cards from verified sellers. On-hand, pre-order and delivered.',
 }
 
 export default function RootLayout({

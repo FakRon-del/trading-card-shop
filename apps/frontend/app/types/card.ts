@@ -1,6 +1,7 @@
 export type Listing = {
   id: string
   condition: string
+  availability: string
   price: string
   stock: number
   description?: string

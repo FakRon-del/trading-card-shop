@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
+import AvailabilityBadge from '../../components/AvailabilityBadge'
 
 async function getShop(shopName: string) {
   try {
@@ -108,6 +109,9 @@ export default async function ShopPage({
               <p className="text-lg font-bold text-green-600 dark:text-green-400">
                 {lowestPrice ? `₱${lowestPrice.toLocaleString()}` : '—'}
               </p>
+            <div className="mt-1">
+                            <AvailabilityBadge availability={listing.availability} />
+                          </div>
               <p className="text-xs text-gray-400">From</p>
             </div>
           </div>

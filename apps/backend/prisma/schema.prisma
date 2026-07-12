@@ -13,6 +13,7 @@ model User {
   name      String
   password  String
   role      Role     @default(BUYER)
+  isBanned  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   orders    Order[]
@@ -32,6 +33,7 @@ model Seller {
   shopName    String    @unique
   description String?
   avatar      String?
+  isVerified  Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   listings    Listing[]
@@ -60,19 +62,26 @@ enum Category {
 }
 
 model Listing {
-  id         String      @id @default(cuid())
-  card       Card        @relation(fields: [cardId], references: [id])
-  cardId     String
-  seller     Seller      @relation(fields: [sellerId], references: [id])
-  sellerId   String
-  condition  Condition
-  price      Decimal     @db.Decimal(10, 2)
-  stock      Int         @default(0)
-  version    Int         @default(0)
-  description String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  orderItems OrderItem[]
+  id           String       @id @default(cuid())
+  card         Card         @relation(fields: [cardId], references: [id])
+  cardId       String
+  seller       Seller       @relation(fields: [sellerId], references: [id])
+  sellerId     String
+  condition    Condition
+  availability Availability @default(ON_HAND)
+  price        Decimal      @db.Decimal(10, 2)
+  stock        Int          @default(0)
+  version      Int          @default(0)
+  description  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  orderItems   OrderItem[]
+}
+
+enum Availability {
+  ON_HAND
+  PRE_ORDER
+  DELIVERED
 }
 
 enum Condition {

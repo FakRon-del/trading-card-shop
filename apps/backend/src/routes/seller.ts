@@ -67,6 +67,7 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
       category?: string
       imageUrl?: string
       condition: string
+      availability?: string
       price: number
       stock: number
       description?: string
@@ -78,7 +79,7 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
     const seller = await prisma.seller.findUnique({ where: { userId: user.userId } })
     if (!seller) return reply.status(404).send({ error: 'Set up your shop first' })
 
-    const { cardName, set, number, rarity, category, imageUrl, condition, price, stock, description } = request.body
+    const { cardName, set, number, rarity, category, imageUrl, condition, availability, price, stock, description } = request.body
 
     // Find or create the card
     let card = await prisma.card.findFirst({
@@ -99,6 +100,7 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
         cardId: card.id,
         sellerId: seller.id,
         condition: condition as any,
+        availability: (availability as any) || 'ON_HAND',
         price,
         stock,
         description
