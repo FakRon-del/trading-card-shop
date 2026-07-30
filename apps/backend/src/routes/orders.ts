@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
 import prisma from '../plugins/prisma'
+import { createNotification } from '../plugins/notify'
 
 const JWT_SECRET = process.env.JWT_SECRET!
 
@@ -15,7 +16,7 @@ function getUser(request: any) {
 
 export default async function orderRoutes(fastify: FastifyInstance) {
 
-  // POST - Place an order (buyer)
+  // POST - Place an order
   fastify.post<{
     Body: {
       items: { listingId: string; quantity: number }[]
@@ -30,19 +31,33 @@ export default async function orderRoutes(fastify: FastifyInstance) {
     let total = 0
     const resolvedItems: { listing: any; quantity: number }[] = []
 
-    for (const item of items) {
-      const listing = await prisma.listing.findUnique({ where: { id: item.listingId } })
-      if (!listing) return reply.status(404).send({ error: 'Listing not found' })
-      if (item.quantity < 1) {
-        return reply.status(400).send({ error: `Invalid quantity for ${listing.id}` })
+    for (const orderItem of items) {
+      if (orderItem.quantity < 1) {
+        return reply.status(400).send({ error: 'Invalid quantity' })
       }
-      if (item.quantity > listing.stock) {
-        return reply.status(400).send({ 
-          error: `Only ${listing.stock} unit${listing.stock === 1 ? '' : 's'} available` 
+
+      const listing = await prisma.listing.findUnique({
+        where: { id: orderItem.listingId },
+        include: { seller: true }
+      })
+
+      if (!listing) {
+        return reply.status(404).send({ error: 'Listing not found' })
+      }
+
+      // Block self-purchase
+      if (listing.seller.userId === user.userId) {
+        return reply.status(400).send({ error: 'You cannot purchase your own listing' })
+      }
+
+      if (orderItem.quantity > listing.stock) {
+        return reply.status(400).send({
+          error: `Only ${listing.stock} unit${listing.stock === 1 ? '' : 's'} available`
         })
       }
-      total += parseFloat(listing.price.toString()) * item.quantity
-      resolvedItems.push({ listing, quantity: item.quantity })
+
+      total += parseFloat(listing.price.toString()) * orderItem.quantity
+      resolvedItems.push({ listing, quantity: orderItem.quantity })
     }
 
     const order = await prisma.$transaction(async (tx) => {
@@ -63,14 +78,38 @@ export default async function orderRoutes(fastify: FastifyInstance) {
         },
         include: { items: true }
       })
+
       for (const { listing, quantity } of resolvedItems) {
         await tx.listing.update({
           where: { id: listing.id },
           data: { stock: { decrement: quantity } }
         })
       }
+
       return newOrder
     })
+
+    // Notify buyer
+    await createNotification({
+      userId: user.userId,
+      title: 'Order Confirmed!',
+      message: `Your order #${order.id.slice(-8).toUpperCase()} has been placed successfully.`,
+      type: 'ORDER'
+    })
+
+    // Notify each seller
+    const sellerIds = new Set(resolvedItems.map(({ listing }) => listing.sellerId))
+    for (const sellerId of sellerIds) {
+      const seller = await prisma.seller.findUnique({ where: { id: sellerId } })
+      if (seller) {
+        await createNotification({
+          userId: seller.userId,
+          title: 'New Order Received!',
+          message: `You have a new order #${order.id.slice(-8).toUpperCase()}. Check your dashboard.`,
+          type: 'ORDER'
+        })
+      }
+    }
 
     return reply.status(201).send(order)
   })
@@ -100,14 +139,9 @@ export default async function orderRoutes(fastify: FastifyInstance) {
     const seller = await prisma.seller.findUnique({ where: { userId: user.userId } })
     if (!seller) return reply.status(404).send({ error: 'Shop not found' })
 
-    // Get all orders that contain this seller's listings
     const orders = await prisma.order.findMany({
       where: {
-        items: {
-          some: {
-            listing: { sellerId: seller.id }
-          }
-        }
+        items: { some: { listing: { sellerId: seller.id } } }
       },
       include: {
         user: { select: { name: true, email: true } },
@@ -142,6 +176,24 @@ export default async function orderRoutes(fastify: FastifyInstance) {
       where: { id: request.params.id },
       data: { status: status as any }
     })
+
+    // Notify buyer about status change
+    const statusMessages: Record<string, string> = {
+      PAID:      'Your payment has been confirmed.',
+      SHIPPED:   'Your order is on its way!',
+      DELIVERED: 'Your order has been delivered. Enjoy your cards!',
+      CANCELLED: 'Your order has been cancelled.',
+    }
+
+    if (statusMessages[status]) {
+      await createNotification({
+        userId: order.userId,
+        title: `Order ${status}`,
+        message: `Order #${order.id.slice(-8).toUpperCase()}: ${statusMessages[status]}`,
+        type: 'ORDER'
+      })
+    }
+
     return order
   })
 }

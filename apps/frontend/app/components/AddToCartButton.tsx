@@ -15,6 +15,7 @@ type Props = {
     name: string
     imageUrl: string | null
   }
+  ownerId?: string
 }
 
 export default function AddToCartButton({ listing, card }: Props) {
@@ -22,10 +23,12 @@ export default function AddToCartButton({ listing, card }: Props) {
   const [added, setAdded] = useState(false)
 
   const handleAddToCart = () => {
-    // Check if logged in
-    const user = localStorage.getItem('user')
-    if (!user) {
-      router.push('/register')
+    const userStr = localStorage.getItem('user')
+    if (!userStr) { router.push('/register'); return }
+
+    // Block seller from buying own listing
+    if (ownerId && JSON.parse(userStr).id === ownerId) {
+      alert('You cannot add your own listing to cart.')
       return
     }
 

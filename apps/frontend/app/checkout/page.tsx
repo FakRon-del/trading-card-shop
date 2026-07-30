@@ -22,12 +22,42 @@ export default function CheckoutPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [orderId, setOrderId] = useState('')
-
+const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
   useEffect(() => {
     if (!getUser()) { router.push('/login'); return }
+
+    // Handle "Buy Now" — single item direct checkout
+    const params = new URLSearchParams(window.location.search)
+    const buyListingId = params.get('buy')
+
+    if (buyListingId) {
+      // Fetch listing details for buy now
+      fetch(`http://localhost:4000/api/cards`)
+        .then(r => r.json())
+        .then((cards: any[]) => {
+          for (const card of cards) {
+            const listing = card.listings?.find((l: any) => l.id === buyListingId)
+            if (listing) {
+              const item = {
+                listingId: listing.id,
+                cardName: card.name,
+                price: listing.price,
+                quantity: 1
+              }
+              setCart([item])
+              setCartSnapshot([item])
+              return
+            }
+          }
+        })
+      return
+    }
+
     const stored = localStorage.getItem('cart')
     if (!stored || JSON.parse(stored).length === 0) return
-    setCart(JSON.parse(stored))
+    const parsed = JSON.parse(stored)
+    setCart(parsed)
+    setCartSnapshot(parsed)
   }, [])
 
   const total = cart.reduce((sum, i) => sum + parseFloat(i.price) * i.quantity, 0)
@@ -43,7 +73,8 @@ export default function CheckoutPage() {
       }
     }
 
-    const cartSnapshot = [...cart]
+    const snapshot = [...cart]
+    setCartSnapshot(snapshot)
     setLoading(true)
     setError('')
 

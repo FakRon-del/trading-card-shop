@@ -12,20 +12,29 @@ async function getCard(id: string) {
   } catch { return null }
 }
 
+const CONDITION_LABELS: Record<string, string> = {
+  NEAR_MINT:         'Near Mint',
+  LIGHTLY_PLAYED:    'Lightly Played',
+  MODERATELY_PLAYED: 'Moderately Played',
+  HEAVILY_PLAYED:    'Heavily Played',
+  DAMAGED:           'Damaged',
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  SINGLE_CARD:  'Single Card',
+  BOOSTER_BOX:  'Booster Box',
+  SLEEVES:      'Sleeves',
+  TOPLOADER:    'Top Loader',
+  ACRYLIC_CASE: 'Acrylic Case',
+  FRAME:        'Frame',
+}
+
 const RARITY_STYLES: Record<string, string> = {
   'Holo Rare':  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   'Ultra Rare': 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
   'Rare':       'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   'Common':     'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
   'Uncommon':   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-}
-
-const CONDITION_LABELS: Record<string, string> = {
-  NEAR_MINT:        'Near Mint',
-  LIGHTLY_PLAYED:   'Lightly Played',
-  MODERATELY_PLAYED:'Moderately Played',
-  HEAVILY_PLAYED:   'Heavily Played',
-  DAMAGED:          'Damaged',
 }
 
 export default async function CardDetailPage({
@@ -48,111 +57,175 @@ export default async function CardDetailPage({
     )
   }
 
-  const rarityStyle = RARITY_STYLES[card.rarity] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-  const lowestPrice = card.listings?.length > 0
-    ? Math.min(...card.listings.map((l: any) => parseFloat(l.price)))
-    : null
+  const rarityStyle = RARITY_STYLES[card.rarity]
+    ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
       <Navbar />
 
-      <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="max-w-5xl mx-auto px-4 py-4">
 
         {/* Back */}
-        <Link href="/" className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 transition-colors mb-4">
+        <Link href="/"
+          className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 transition-colors mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to shop
         </Link>
 
-        {/* Card header */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden mb-4">
-          <div className="flex gap-4 p-4">
+        {/* Card detail — split layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* Image */}
-              <div className="relative w-32 flex-shrink-0 aspect-[3/4] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden">
-                {card.imageUrl ? (
-                  <img
-                    src={card.imageUrl}
-                    alt={card.name}
-                    className="w-full h-full object-contain p-1"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">🃏</div>
-                )}
-              </div>
+          {/* Left — Image */}
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-xs aspect-[3/4] bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+              {card.imageUrl ? (
+                <img
+                  src={card.imageUrl}
+                  alt={card.name}
+                  className="w-full h-full object-contain p-4"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-6xl">🃏</div>
+              )}
+            </div>
+          </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0 py-1">
-              <h1 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{card.name}</h1>
-              <p className="text-xs text-gray-400 mb-2">{card.set} · #{card.number}</p>
+          {/* Right — Info */}
+          <div className="space-y-4">
+
+            {/* Category + game tag */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-2.5 py-1 rounded-full uppercase tracking-wide">
+                {card.set}
+              </span>
+              <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2.5 py-1 rounded-full">
+                {CATEGORY_LABELS[card.category] ?? 'Single Card'}
+              </span>
+            </div>
+
+            {/* Card name */}
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-snug">
+              {card.name}
+            </h1>
+
+            {/* Rarity + number */}
+            <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-0.5 rounded-full ${rarityStyle}`}>
                 {card.rarity}
               </span>
-              {lowestPrice && (
-                <div className="mt-3">
-                  <p className="text-xs text-gray-400">Starting from</p>
-                  <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                    ₱{lowestPrice.toLocaleString()}
-                  </p>
+              <span className="text-xs text-gray-400">#{card.number}</span>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-100 dark:border-gray-800" />
+
+            {/* Listings from sellers */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                Available from sellers
+                <span className="ml-1.5 normal-case font-normal text-gray-400">
+                  ({card.listings?.length ?? 0} listings)
+                </span>
+              </p>
+
+              {!card.listings || card.listings.length === 0 ? (
+                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 py-8 text-center">
+                  <p className="text-sm text-gray-400">No sellers listing this card yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {card.listings.map((listing: any) => (
+                    <div key={listing.id}
+                      className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+
+                      {/* Price */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="text-xs text-gray-400 mb-0.5">PRICE</p>
+                          <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                            ₱{parseFloat(listing.price).toLocaleString()}
+                          </p>
+                          {listing.availability === 'PRE_ORDER' && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Full payment required · No cancellations
+                            </p>
+                          )}
+                        </div>
+                        <AvailabilityBadge availability={listing.availability} />
+                      </div>
+
+                      {/* ETA for pre-orders */}
+                      {listing.availability === 'PRE_ORDER' && listing.description && (
+                        <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-lg px-3 py-2 mb-3">
+                          <span className="text-xs font-medium text-amber-700 dark:text-amber-400">ETA</span>
+                          <span className="text-xs text-amber-600 dark:text-amber-300">{listing.description}</span>
+                        </div>
+                      )}
+
+                      {/* Details grid */}
+                      <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                          <p className="text-gray-400 mb-0.5">Condition</p>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {CONDITION_LABELS[listing.condition] ?? listing.condition}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                          <p className="text-gray-400 mb-0.5">Stock</p>
+                          <p className={`font-medium ${
+                            listing.stock > 0
+                              ? 'text-green-600 dark:text-green-400'
+                              : 'text-red-500'
+                          }`}>
+                            {listing.stock > 0 ? `${listing.stock} available` : 'Out of stock'}
+                          </p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                          <p className="text-gray-400 mb-0.5">Set</p>
+                          <p className="font-medium text-gray-900 dark:text-white truncate">{card.set}</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                          <p className="text-gray-400 mb-0.5">Seller</p>
+                          {listing.seller ? (
+                            <Link href={`/shops/${listing.seller.shopName}`}
+                              className="font-medium text-blue-500 hover:text-blue-600 truncate block">
+                              {listing.seller.shopName}
+                            </Link>
+                          ) : (
+                            <p className="font-medium text-gray-900 dark:text-white">—</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Description if not pre-order ETA */}
+                      {listing.description && listing.availability !== 'PRE_ORDER' && (
+                        <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+                          {listing.description}
+                        </p>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex gap-2">
+                        <AddToCartButton
+                          listing={listing}
+                          card={card}
+                          ownerId={listing.seller?.userId}
+                        />
+                        <Link
+                          href={`/checkout?buy=${listing.id}`}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg text-center transition-colors">
+                          Buy Now
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Listings */}
-        <div>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-            Available from sellers
-            <span className="ml-1.5 text-xs font-normal text-gray-400">
-              {card.listings?.length ?? 0} listings
-            </span>
-          </h2>
-
-          {!card.listings || card.listings.length === 0 ? (
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 py-10 text-center">
-              <p className="text-sm text-gray-400">No sellers listing this card yet</p>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {card.listings.map((listing: any) => (
-                <div key={listing.id}
-                  className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-base font-bold text-green-600 dark:text-green-400">
-                        ₱{parseFloat(listing.price).toLocaleString()}
-                      </p>
-                      <span className="text-xs text-gray-400">
-                        · {listing.stock} left
-                      </span>
-                    </div>
-                    <div className="mb-1">
-                      <AvailabilityBadge availability={listing.availability} />
-                    </div>
-                    <p className="text-xs text-gray-400 mb-1">
-                      {CONDITION_LABELS[listing.condition] ?? listing.condition}
-                    </p>
-                    {listing.seller && (
-                      <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs flex-shrink-0">
-                          {listing.seller.shopName?.charAt(0)}
-                        </div>
-                        <span className="text-xs text-blue-500">{listing.seller.shopName}</span>
-                      </div>
-                    )}
-                    {listing.description && (
-                      <p className="text-xs text-gray-400 mt-1 truncate">{listing.description}</p>
-                    )}
-                  </div>
-                  <AddToCartButton listing={listing} card={card} />
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
