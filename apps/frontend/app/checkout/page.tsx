@@ -15,6 +15,7 @@ type CartItem = {
 
 export default function CheckoutPage() {
   const router = useRouter()
+    const [paymentMethod, setPaymentMethod] = useState<'cod' | 'stripe'>('cod')
   const [cart, setCart] = useState<CartItem[]>([])
   const [address, setAddress] = useState('')
   const [contact, setContact] = useState('')
@@ -62,13 +63,13 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
 
   const total = cart.reduce((sum, i) => sum + parseFloat(i.price) * i.quantity, 0)
 
-  const handleOrder = async () => {
+    const handleOrder = async () => {
     if (!address.trim()) { setError('Please enter your delivery address'); return }
     if (!contact.trim()) { setError('Please enter your contact number'); return }
 
     for (const item of cart) {
       if (item.quantity < 1) {
-        setError('Invalid quantity detected. Please update your cart.')
+        setError('Invalid quantity detected.')
         return
       }
     }
@@ -79,26 +80,49 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
     setError('')
 
     try {
-      const res = await fetch('http://localhost:4000/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({
-          items: cart.map(i => ({ listingId: i.listingId, quantity: i.quantity })),
-          address,
-          contactNumber: contact
+      if (paymentMethod === 'stripe') {
+        // Stripe checkout
+        const res = await fetch('http://localhost:4000/api/payments/create-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({
+            items: cart.map(i => ({ listingId: i.listingId, quantity: i.quantity })),
+            address,
+            contactNumber: contact
+          })
         })
-      })
+        const data = await res.json()
+        if (!res.ok) { setError(data.error || 'Payment failed'); return }
 
-      const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Failed to place order'); return }
+        // Redirect to Stripe checkout page
+        localStorage.removeItem('cart')
+        window.location.href = data.url
 
-      localStorage.removeItem('cart')
-      setCart(cartSnapshot)
-      setOrderId(data.id)
-      setSuccess(true)
+      } else {
+        // COD flow
+        const res = await fetch('http://localhost:4000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({
+            items: cart.map(i => ({ listingId: i.listingId, quantity: i.quantity })),
+            address,
+            contactNumber: contact
+          })
+        })
+        const data = await res.json()
+        if (!res.ok) { setError(data.error || 'Failed to place order'); return }
+
+        localStorage.removeItem('cart')
+        setCart(snapshot)
+        setOrderId(data.id)
+        setSuccess(true)
+      }
 
     } catch {
       setError('Something went wrong. Please try again.')
@@ -239,15 +263,36 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
           </div>
         </div>
 
-        {/* Payment method */}
+                {/* Payment method */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
           <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3">Payment Method</h3>
-          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-            <div className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-medium text-gray-900 dark:text-white">Cash on Delivery (COD)</p>
-              <p className="text-xs text-gray-400">Pay when your cards arrive</p>
-            </div>
+          <div className="space-y-2">
+            <button
+              onClick={() => setPaymentMethod('cod')}
+              className={`w-full flex items-center gap-3 rounded-lg p-3 border transition-colors text-left ${
+                paymentMethod === 'cod'
+                  ? 'bg-[#EFF4FF] border-[#2563EB]'
+                  : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+              }`}>
+              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${paymentMethod === 'cod' ? 'bg-[#2563EB]' : 'bg-gray-300'}`} />
+              <div>
+                <p className="text-xs font-medium text-gray-900 dark:text-white">Cash on Delivery (COD)</p>
+                <p className="text-xs text-gray-400">Pay when your cards arrive</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setPaymentMethod('stripe')}
+              className={`w-full flex items-center gap-3 rounded-lg p-3 border transition-colors text-left ${
+                paymentMethod === 'stripe'
+                  ? 'bg-[#EFF4FF] border-[#2563EB]'
+                  : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+              }`}>
+              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${paymentMethod === 'stripe' ? 'bg-[#2563EB]' : 'bg-gray-300'}`} />
+              <div>
+                <p className="text-xs font-medium text-gray-900 dark:text-white">Credit / Debit Card</p>
+                <p className="text-xs text-gray-400">Secure payment via Stripe</p>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -276,7 +321,7 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
             onClick={handleOrder}
             disabled={loading || cart.length === 0}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-medium py-3 rounded-xl transition-colors text-sm">
-            {loading ? 'Placing order...' : 'Place Order'}
+                          {loading ? 'Processing...' : paymentMethod === 'stripe' ? 'Pay with Card' : 'Place Order (COD)'}
           </button>
           <p className="text-center text-xs text-gray-400 mt-2">
             By ordering you agree to our terms of service

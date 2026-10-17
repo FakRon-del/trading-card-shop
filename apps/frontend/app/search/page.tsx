@@ -5,15 +5,16 @@ import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import BottomNav from '../components/BottomNav'
 
-const CATEGORIES = ['All', 'Cards', 'Booster Box', 'Sleeves', 'Top Loader', 'Acrylic Case', 'Frame']
+const CATEGORIES = ['All', 'Cards', 'Booster Box', 'Sleeves', 'Top Loader', 'Acrylic Case', 'Frame', 'Display Frame']
 
 const CATEGORY_MAP: Record<string, string> = {
-  'Cards': 'SINGLE_CARD',
-  'Booster Box': 'BOOSTER_BOX',
-  'Sleeves': 'SLEEVES',
-  'Top Loader': 'TOPLOADER',
-  'Acrylic Case': 'ACRYLIC_CASE',
-  'Frame': 'FRAME',
+  'Cards':         'SINGLE_CARD',
+  'Booster Box':   'BOOSTER_BOX',
+  'Sleeves':       'SLEEVES',
+  'Top Loader':    'TOPLOADER',
+  'Acrylic Case':  'ACRYLIC_CASE',
+  'Frame':         'FRAME',
+  'Display Frame': 'DISPLAY_FRAME',
 }
 const RARITY_STYLES: Record<string, string> = {
   'Holo Rare':  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
@@ -71,7 +72,7 @@ export default function SearchPage() {
 
   // Filter whenever debounced query or category changes
   const filterCards = useCallback(() => {
-    let results = [cards, category, availability, debouncedQuery]
+    let results = [...cards]
 
     // Category filter — match against product category
     if (category !== 'All') {
@@ -103,7 +104,7 @@ export default function SearchPage() {
     }
 
     setFiltered(results)
-  }, [cards, category, debouncedQuery])
+  }, [cards, category, availability, debouncedQuery])
 
   useEffect(() => {
     filterCards()

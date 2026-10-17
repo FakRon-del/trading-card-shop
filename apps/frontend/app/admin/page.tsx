@@ -216,7 +216,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2">
           <img src="/logo.png" alt="BHT" className="w-6 h-6 object-contain" />
           <span className="font-bold text-gray-900 dark:text-white text-xs">
-            Booster Hunt TCG
+            Pullverse TCG
           </span>
           <span className="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-xs px-2 py-0.5 rounded-full font-medium">
             Admin

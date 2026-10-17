@@ -245,7 +245,7 @@ export default function WelcomePage() {
         <div className="flex items-center gap-2.5">
           <img src="/logo.png" alt="BHT" className="w-8 h-8 object-contain hover:scale-110 transition-transform duration-300" />
           <span className="font-bold text-gray-900 dark:text-white text-sm">
-            Booster Hunt <span className="text-blue-500">TCG</span>
+            Pullverse <span className="text-blue-500">TCG</span>
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -311,7 +311,7 @@ export default function WelcomePage() {
           <div className={`transition-all duration-700 ${ready ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} mb-6`}>
             <img
               src="/logo.png"
-              alt="Booster Hunt TCG"
+              alt="Pullverse TCG"
               className="w-24 h-24 object-contain mx-auto hover:rotate-12 transition-transform duration-500"
             />
           </div>
@@ -388,12 +388,12 @@ export default function WelcomePage() {
       <div className="max-w-lg mx-auto px-5 py-20 text-center">
         <img src="/logo.png" alt="BHT" className="w-16 h-16 object-contain mx-auto mb-6 opacity-90 hover:rotate-180 transition-transform duration-700" />
         <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-3">Ready to hunt?</h2>
-        <p className="text-base text-gray-500 dark:text-gray-400 mb-8">Join the Philippine TCG community on Booster Hunt TCG.</p>
+        <p className="text-base text-gray-500 dark:text-gray-400 mb-8">Join the Philippine TCG community on Pullverse TCG.</p>
         <Link href="/register"
           className="inline-block gradient-bg text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-300 shadow-2xl hover:-translate-y-1 hover:shadow-3xl">
           Create free account →
         </Link>
-        <p className="text-sm text-gray-400 mt-8 font-medium">Booster Hunt TCG · Made in the Philippines 🇵🇭</p>
+        <p className="text-sm text-gray-400 mt-8 font-medium">Pullverse TCG · Made in the Philippines 🇵🇭</p>
       </div>
     </main>
   )

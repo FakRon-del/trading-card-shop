@@ -21,12 +21,13 @@ const CONDITION_LABELS: Record<string, string> = {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  SINGLE_CARD:  'Single Card',
-  BOOSTER_BOX:  'Booster Box',
-  SLEEVES:      'Sleeves',
-  TOPLOADER:    'Top Loader',
-  ACRYLIC_CASE: 'Acrylic Case',
-  FRAME:        'Frame',
+  SINGLE_CARD:   'Single Card',
+  BOOSTER_BOX:   'Booster Box',
+  SLEEVES:       'Sleeves',
+  TOPLOADER:     'Top Loader',
+  ACRYLIC_CASE:  'Acrylic Case',
+  FRAME:         'Frame',
+  DISPLAY_FRAME: 'Display Frame',
 }
 
 const RARITY_STYLES: Record<string, string> = {
@@ -61,7 +62,14 @@ export default async function CardDetailPage({
     ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
+    <div className="min-h-screen pb-16 relative"
+      style={{
+        background: 'radial-gradient(ellipse 80% 40% at 10% 0%, rgba(59,130,246,0.07) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 90% 100%, rgba(59,130,246,0.05) 0%, transparent 60%)'
+      }}>
+
+      {/* Base background */}
+      <div className="absolute inset-0 bg-gray-50 dark:bg-gray-950 -z-10" />
+
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 py-4">
@@ -139,7 +147,13 @@ export default async function CardDetailPage({
                 <div className="space-y-3">
                   {card.listings.map((listing: any) => (
                     <div key={listing.id}
-                      className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                      className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 overflow-hidden">
+
+                      {/* Subtle blue corner glows */}
+                      <div className="absolute top-0 left-0 w-20 h-20 rounded-br-full pointer-events-none"
+                        style={{ background: 'radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 70%)' }} />
+                      <div className="absolute bottom-0 right-0 w-20 h-20 rounded-tl-full pointer-events-none"
+                        style={{ background: 'radial-gradient(circle at bottom right, rgba(59,130,246,0.10), transparent 70%)' }} />
 
                       {/* Price */}
                       <div className="flex items-start justify-between mb-3">
@@ -200,11 +214,30 @@ export default async function CardDetailPage({
                         </div>
                       </div>
 
-                      {/* Description if not pre-order ETA */}
-                      {listing.description && listing.availability !== 'PRE_ORDER' && (
-                        <p className="text-xs text-gray-400 mb-3 leading-relaxed">
-                          {listing.description}
-                        </p>
+                      {/* Description — always visible */}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-400 mb-1 font-medium">Description</p>
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 min-h-[48px]">
+                          {listing.description && listing.availability !== 'PRE_ORDER' ? (
+                            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                              {listing.description}
+                            </p>
+                          ) : listing.availability === 'PRE_ORDER' ? (
+                            <p className="text-xs text-gray-400 italic">See ETA above for details.</p>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">No description provided.</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Display Frame special note */}
+                      {card.category === 'DISPLAY_FRAME' && (
+                        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-lg p-3 mb-3">
+                          <p className="text-xs font-medium text-amber-700 dark:text-amber-400 mb-1">🎨 Display Frame</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-300 leading-relaxed">
+                            Premium collector display frame. Card not included unless stated. Compatible with raw and graded cards.
+                          </p>
+                        </div>
                       )}
 
                       {/* Action buttons */}

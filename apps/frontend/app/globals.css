@@ -3,20 +3,21 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
-  
-  a {
-    text-decoration: none;
+  * { box-sizing: border-box; }
+  a { text-decoration: none; }
+
+  :root {
+    --blue:        #2563EB;
+    --blue-hover:  #1D4ED8;
+    --blue-light:  #EFF4FF;
+    --blue-border: #DBEAFE;
+    --green:       #16A34A;
+    --green-light: #DCFCE7;
+    --text-dark:   #0A1628;
+    --text-mid:    #1E3A5F;
+    --text-muted:  #5A7A9A;
   }
 
-  /* Hide scrollbar but keep scroll */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

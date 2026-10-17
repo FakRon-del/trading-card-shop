@@ -59,6 +59,7 @@ enum Category {
   TOPLOADER
   ACRYLIC_CASE
   FRAME
+  DISPLAY_FRAME
 }
 
 model Listing {
@@ -131,5 +132,14 @@ model Notification {
   message   String
   type      String   @default("INFO")
   read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+model Review {
+  id        String   @id @default(cuid())
+  sellerId  String
+  buyerId   String
+  orderId   String   @unique
+  rating    Int
+  comment   String?
   createdAt DateTime @default(now())
 }

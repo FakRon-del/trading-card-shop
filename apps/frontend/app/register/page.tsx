@@ -41,15 +41,15 @@ export default function RegisterPage() {
 
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8">
-        <img src="/logo.png" alt="Booster Hunt TCG" className="w-9 h-9 object-contain" />
+        <img src="/logo.png" alt="Pullverse TCG" className="w-9 h-9 object-contain" />
         <span className="font-semibold text-gray-900 dark:text-white text-lg">
-          Booster Hunt <span className="text-blue-500">TCG</span>
+          Pullverse <span className="text-blue-500">TCG</span>
         </span>
       </Link>
 
       <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
         <h1 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Create account</h1>
-        <p className="text-xs text-gray-400 mb-5">Join Booster Hunt TCG — free forever</p>
+        <p className="text-xs text-gray-400 mb-5">Join Pullverse TCG — free forever</p>
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg mb-4">

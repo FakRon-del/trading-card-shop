@@ -44,6 +44,7 @@ export default function DashboardPage() {
   })
   const [addLoading, setAddLoading] = useState(false)
   const [addError, setAddError] = useState('')
+  const [rating, setRating] = useState<{ average: number; total: number } | null>(null)
 
   useEffect(() => {
     const user = getUser()
@@ -60,7 +61,12 @@ export default function DashboardPage() {
       if (res.status === 404) { router.push('/dashboard/setup'); return }
       setShop(await res.json())
     } catch {} finally { setLoading(false) }
+    // Fetch seller rating
+      const ratingRes = await fetch(`http://localhost:4000/api/reviews/seller/${data.id}`)
+      const ratingData = await ratingRes.json()
+      setRating({ average: ratingData.average, total: ratingData.total })
   }
+  
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -122,7 +128,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
               <p className="text-xs text-gray-400 mb-0.5">Listings</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{shop?.listings.length ?? 0}</p>
@@ -134,6 +140,13 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+              <p className="text-xs text-gray-400 mb-0.5">Rating</p>
+              <p className="text-xl font-bold text-amber-500">
+                {rating ? `${rating.average}⭐` : '—'}
+              </p>
+              <p className="text-xs text-gray-400">{rating?.total ?? 0} reviews</p>
+            </div>
         </div>
 
         {/* Quick links */}
@@ -185,12 +198,13 @@ export default function DashboardPage() {
                   value={form.category}
                   onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
                   className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-xs outline-none">
-                  <option value="SINGLE_CARD">🃏 Single Card</option>
-                  <option value="BOOSTER_BOX">📦 Booster Box</option>
-                  <option value="SLEEVES">🗂️ Sleeves</option>
-                  <option value="TOPLOADER">🛡️ Top Loader</option>
-                  <option value="ACRYLIC_CASE">🔲 Acrylic Case</option>
-                  <option value="FRAME">🖼️ Frame</option>
+                  <option value="SINGLE_CARD"> Single Card</option>
+                  <option value="BOOSTER_BOX"> Booster Box</option>
+                  <option value="SLEEVES"> Sleeves</option>
+                  <option value="TOPLOADER"> Top Loader</option>
+                  <option value="ACRYLIC_CASE"> Acrylic Case</option>
+                  <option value="FRAME"> Frame</option>
+                  <option value="DISPLAY_FRAME"> Display Frame</option>
                 </select>
               </div>
 

@@ -18,7 +18,7 @@ function getUser(request: any) {
 
 export default async function sellerRoutes(fastify: FastifyInstance) {
 
-  // POST - Setup shop (first time)
+   // POST - Setup shop (first time)
   fastify.post<{
     Body: { shopName: string; description?: string }
   }>('/seller/setup', async (request, reply) => {
@@ -26,11 +26,20 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
     if (!user) return reply.status(401).send({ error: 'Unauthorized' })
     if (user.role !== 'SELLER') return reply.status(403).send({ error: 'Not a seller account' })
 
+    // Check if seller already has a shop
+    const existingShop = await prisma.seller.findUnique({
+      where: { userId: user.userId }
+    })
+    if (existingShop) {
+      // Already has a shop — just return it instead of erroring
+      return reply.status(200).send(existingShop)
+    }
+
     const { shopName, description } = request.body
 
     // Check shop name taken
-    const existing = await prisma.seller.findUnique({ where: { shopName } })
-    if (existing) return reply.status(400).send({ error: 'Shop name already taken' })
+    const nameTaken = await prisma.seller.findUnique({ where: { shopName } })
+    if (nameTaken) return reply.status(400).send({ error: 'Shop name already taken — please choose another' })
 
     const seller = await prisma.seller.create({
       data: { userId: user.userId, shopName, description }
@@ -155,16 +164,72 @@ export default async function sellerRoutes(fastify: FastifyInstance) {
     return seller
   })
 
-  // PATCH - Upgrade buyer to seller
+    // PATCH - Upgrade buyer to seller
   fastify.patch('/seller/upgrade', async (request, reply) => {
     const user = getUser(request)
     if (!user) return reply.status(401).send({ error: 'Unauthorized' })
 
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: user.userId },
-      data: { role: 'SELLER' }
+      data: { role: 'SELLER' },
+      select: { id: true, email: true, name: true, role: true }
     })
 
-    return { success: true, message: 'Account upgraded to seller' }
+    // Issue new token with updated role
+    const jwt = require('jsonwebtoken')
+    const newToken = jwt.sign(
+      { userId: updated.id, email: updated.email, role: updated.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    )
+
+    return { success: true, token: newToken, user: updated }
+  })
+
+   // PATCH - Downgrade seller back to buyer
+  fastify.patch('/seller/downgrade', async (request, reply) => {
+    const user = getUser(request)
+    if (!user) return reply.status(401).send({ error: 'Unauthorized' })
+
+    const seller = await prisma.seller.findUnique({
+      where: { userId: user.userId },
+      include: {
+        listings: {
+          include: {
+            orderItems: {
+              include: { order: true }
+            }
+          }
+        }
+      }
+    })
+
+    // If no shop exists, just downgrade directly
+    if (seller) {
+      const activeOrders = seller.listings.flatMap(l => l.orderItems)
+        .filter(item => ['PENDING', 'PAID', 'SHIPPED'].includes(item.order.status))
+
+      if (activeOrders.length > 0) {
+        return reply.status(400).send({
+          error: `You have ${activeOrders.length} active order(s) that must be completed or cancelled before downgrading.`
+        })
+      }
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: user.userId },
+      data: { role: 'BUYER' },
+      select: { id: true, email: true, name: true, role: true }
+    })
+
+    // Issue new token with updated role
+    const jwt = require('jsonwebtoken')
+    const newToken = jwt.sign(
+      { userId: updated.id, email: updated.email, role: updated.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    )
+
+    return { success: true, token: newToken, user: updated }
   })
 }

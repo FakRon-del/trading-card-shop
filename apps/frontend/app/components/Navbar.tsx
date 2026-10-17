@@ -38,11 +38,11 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2">
           <img
             src="/logo.png"
-            alt="Booster Hunt TCG"
+            alt="Pullverse TCG"
             className="w-8 h-8 object-contain"
           />
           <span className="font-semibold text-gray-900 dark:text-white text-base">
-            Booster Hunt <span className="text-blue-500">TCG</span>
+            Pullverse <span className="text-[#2563EB]">TCG</span>
           </span>
         </Link>
 
@@ -72,7 +72,7 @@ export default function Navbar() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 19a1 1 0 100 2 1 1 0 000-2zm8 0a1 1 0 100 2 1 1 0 000-2z" />
             </svg>
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#2563EB] text-white text-xs rounded-full flex items-center justify-center">
                 {cartCount}
               </span>
             )}
@@ -99,7 +99,7 @@ export default function Navbar() {
                 Sign in
               </Link>
               <Link href="/register"
-                className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg transition-colors">
+                className="text-sm bg-blue-500 hover:bg-[#1D4ED8]text-white px-3 py-1.5 rounded-lg transition-colors">
                 Register
               </Link>
             </div>

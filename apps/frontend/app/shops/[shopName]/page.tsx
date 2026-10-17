@@ -1,8 +1,8 @@
-
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import BottomNav from '../../components/BottomNav'
 import AvailabilityBadge from '../../components/AvailabilityBadge'
+import StarRating from '../../components/StarRating'
 
 async function getShop(shopName: string) {
   try {
@@ -12,6 +12,16 @@ async function getShop(shopName: string) {
     if (!res.ok) return null
     return res.json()
   } catch { return null }
+}
+
+async function getReviews(sellerId: string) {
+  try {
+    const res = await fetch(`http://localhost:4000/api/reviews/seller/${sellerId}`, {
+      cache: 'no-store'
+    })
+    if (!res.ok) return { reviews: [], average: 0, total: 0 }
+    return res.json()
+  } catch { return { reviews: [], average: 0, total: 0 } }
 }
 
 const RARITY_STYLES: Record<string, string> = {
@@ -44,12 +54,13 @@ export default async function ShopPage({
         <div className="text-center">
           <p className="text-4xl mb-3">🏪</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Shop not found</p>
-          <Link href="/" className="text-xs text-blue-500">← Back to shop</Link>
+          <Link href="/" className="text-xs text-[#2563EB]">← Back to shop</Link>
         </div>
       </div>
     )
   }
 
+  const reviewData = await getReviews(shop.id)
   const totalStock = shop.listings?.reduce((s: number, l: any) => s + l.stock, 0) ?? 0
   const lowestPrice = shop.listings?.length > 0
     ? Math.min(...shop.listings.map((l: any) => parseFloat(l.price)))
@@ -63,7 +74,7 @@ export default async function ShopPage({
 
         {/* Back */}
         <Link href="/"
-          className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 transition-colors">
+          className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#2563EB] transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -73,7 +84,7 @@ export default async function ShopPage({
         {/* Shop header */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+            <div className="w-14 h-14 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
               {shop.shopName?.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -81,12 +92,22 @@ export default async function ShopPage({
                 <h1 className="text-base font-semibold text-gray-900 dark:text-white">
                   {shop.shopName}
                 </h1>
-                <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                  Verified
-                </span>
+                {shop.isVerified && (
+                  <span className="text-xs bg-[#EFF4FF] text-[#2563EB] px-2 py-0.5 rounded-full">
+                    Verified
+                  </span>
+                )}
               </div>
               {shop.description && (
                 <p className="text-xs text-gray-400">{shop.description}</p>
+              )}
+              {reviewData.total > 0 && (
+                <div className="flex items-center gap-1.5 mt-1">
+                  <StarRating value={Math.round(reviewData.average)} readonly size="sm" />
+                  <span className="text-xs text-gray-500">
+                    {reviewData.average} ({reviewData.total} reviews)
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -106,12 +127,9 @@ export default async function ShopPage({
               <p className="text-xs text-gray-400">In Stock</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
-              <p className="text-lg font-bold text-green-600 dark:text-green-400">
+              <p className="text-lg font-bold text-[#16A34A] dark:text-[#4ADE80]">
                 {lowestPrice ? `₱${lowestPrice.toLocaleString()}` : '—'}
               </p>
-            <div className="mt-1">
-                            <AvailabilityBadge availability={listing.availability} />
-                          </div>
               <p className="text-xs text-gray-400">From</p>
             </div>
           </div>
@@ -139,10 +157,10 @@ export default async function ShopPage({
 
                 return (
                   <Link key={listing.id} href={`/cards/${listing.card?.id}`}>
-                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-[#2563EB] hover:shadow-sm transition-all">
 
                       {/* Image */}
-                      <div className="relative w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
+                      <div className="w-full aspect-[3/4] bg-gray-100 dark:bg-gray-800">
                         {listing.card?.imageUrl ? (
                           <img
                             src={listing.card.imageUrl}
@@ -165,19 +183,20 @@ export default async function ShopPage({
                         <span className={`text-xs px-1.5 py-0.5 rounded-full ${rarityStyle}`}>
                           {listing.card?.rarity}
                         </span>
-                        <div className="mt-2 space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-green-600 dark:text-green-400">
-                              ₱{parseFloat(listing.price).toLocaleString()}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {listing.stock} left
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-400">
-                            {CONDITION_LABELS[listing.condition] ?? listing.condition}
-                          </p>
+                        <div className="mt-1.5">
+                          <AvailabilityBadge availability={listing.availability} size="xs" />
                         </div>
+                        <div className="mt-1.5 flex items-center justify-between">
+                          <span className="text-xs font-bold text-[#16A34A]">
+                            ₱{parseFloat(listing.price).toLocaleString()}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {listing.stock} left
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {CONDITION_LABELS[listing.condition] ?? listing.condition}
+                        </p>
                       </div>
                     </div>
                   </Link>
@@ -186,8 +205,56 @@ export default async function ShopPage({
             </div>
           )}
         </div>
-      </div>
 
+        {/* Reviews */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+              Reviews
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({reviewData.total})
+              </span>
+            </h2>
+            {reviewData.total > 0 && (
+              <div className="flex items-center gap-1.5">
+                <StarRating value={Math.round(reviewData.average)} readonly size="sm" />
+                <span className="text-xs font-bold text-gray-900 dark:text-white">
+                  {reviewData.average}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {reviewData.reviews.length === 0 ? (
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 py-8 text-center">
+              <p className="text-sm text-gray-400">No reviews yet</p>
+              <p className="text-xs text-gray-400 mt-1">Be the first to review this seller!</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {reviewData.reviews.map((review: any) => (
+                <div key={review.id}
+                  className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <StarRating value={review.rating} readonly size="sm" />
+                    <span className="text-xs text-gray-400">
+                      {new Date(review.createdAt).toLocaleDateString('en-PH', {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  {review.comment && (
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      "{review.comment}"
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
       <BottomNav />
     </div>
   )
