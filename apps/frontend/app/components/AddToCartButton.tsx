@@ -18,7 +18,7 @@ type Props = {
   ownerId?: string
 }
 
-export default function AddToCartButton({ listing, card }: Props) {
+export default function AddToCartButton({ listing, card, ownerId }: Props) {
   const router = useRouter()
   const [added, setAdded] = useState(false)
 
