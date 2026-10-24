@@ -369,9 +369,9 @@ export default function WelcomePage() {
       <div className="border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="max-w-4xl mx-auto px-5 py-16 grid grid-cols-1 sm:grid-cols-3 gap-8">
           {[
-            { e: '✅', t: 'On-hand & Pre-order', d: 'Know availability before you buy — on hand, pre-order, or delivered.' },
-            { e: '🏪', t: 'Verified sellers',    d: 'Every seller is vetted. Browse hundreds of shops in one place.' },
-            { e: '🚚', t: 'Cash on Delivery',    d: 'Pay when your cards arrive. No upfront risk for buyers.' },
+            { e: '', t: 'On-hand & Pre-order', d: 'Know availability before you buy — on hand, pre-order, or delivered.' },
+            { e: '', t: 'Verified sellers',    d: 'Every seller is vetted. Browse hundreds of shops in one place.' },
+            { e: '', t: 'Cash on Delivery',    d: 'Pay when your cards arrive. No upfront risk for buyers.' },
           ].map((f, i) => (
             <div key={f.t} 
               className="text-center group hover:scale-105 transition-all duration-300"

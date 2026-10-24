@@ -1,12 +1,17 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
 import Stripe from 'stripe'
+import type { Stripe as StripeType } from 'stripe'
 import prisma from '../plugins/prisma'
 
+
 const JWT_SECRET = process.env.JWT_SECRET!
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20'
-})
+
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY not set in .env')
+  return new Stripe(key)
+}
 
 function getUser(request: any) {
   const authHeader = request.headers.authorization
@@ -70,8 +75,7 @@ export default async function paymentRoutes(fastify: FastifyInstance) {
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+        const session = await getStripe().checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -94,10 +98,10 @@ export default async function paymentRoutes(fastify: FastifyInstance) {
     const sig = request.headers['stripe-signature'] as string
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-    let event: Stripe.Event
+      let event: StripeType.Event
 
     try {
-      event = stripe.webhooks.constructEvent(
+      event = getStripe().webhooks.constructEvent(
         (request as any).rawBody,
         sig,
         webhookSecret!
@@ -107,7 +111,7 @@ export default async function paymentRoutes(fastify: FastifyInstance) {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session
+      const session = event.data.object as StripeType.Checkout.Session
       const meta = session.metadata!
 
       const items: { listingId: string; quantity: number }[] = JSON.parse(meta.items)
@@ -171,7 +175,7 @@ export default async function paymentRoutes(fastify: FastifyInstance) {
       const user = getUser(request)
       if (!user) return reply.status(401).send({ error: 'Unauthorized' })
 
-      const session = await stripe.checkout.sessions.retrieve(
+      const session = await getStripe().checkout.sessions.retrieve(
         request.query.session_id,
         { expand: ['line_items'] }
       )
