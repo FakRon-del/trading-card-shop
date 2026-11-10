@@ -53,7 +53,7 @@ export default async function uploadRoutes(fastify: FastifyInstance) {
     // Save file
     await pipeline(data.file, fs.createWriteStream(uploadPath))
 
-    const imageUrl = `http://localhost:4000/api/uploads/${filename}`
+    const imageUrl = `https://pullverse-backend.onrender.com/api/uploads/${filename}`
     return reply.status(201).send({ imageUrl, filename })
   })
 }
