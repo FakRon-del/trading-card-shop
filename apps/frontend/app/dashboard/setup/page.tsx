@@ -18,7 +18,7 @@ export default function ShopSetupPage() {
     if (user.role !== 'SELLER') { router.push('/'); return }
 
     // Check if seller already has a shop
-    fetch('http://localhost:4000/api/seller/me', {
+    fetch('https://pullverse-backend.onrender.com/api/seller/me', {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     }).then(res => {
       if (res.ok) {
@@ -36,7 +36,7 @@ export default function ShopSetupPage() {
     setError('')
 
     try {
-      const res = await fetch('http://localhost:4000/api/seller/setup', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/seller/setup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

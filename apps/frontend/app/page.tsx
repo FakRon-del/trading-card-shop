@@ -7,7 +7,7 @@ import AvailabilityBadge from './components/AvailabilityBadge'
 
 async function getCards(): Promise<any[]> {
   try {
-    const res = await fetch('http://localhost:4000/api/cards', { cache: 'no-store' })
+    const res = await fetch('https://pullverse-backend.onrender.com/api/cards', { cache: 'no-store' })
     if (!res.ok) return []
     return res.json()
   } catch {

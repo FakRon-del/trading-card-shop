@@ -33,7 +33,7 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
 
     if (buyListingId) {
       // Fetch listing details for buy now
-      fetch(`http://localhost:4000/api/cards`)
+      fetch(`https://pullverse-backend.onrender.com/api/cards`)
         .then(r => r.json())
         .then((cards: any[]) => {
           for (const card of cards) {
@@ -82,7 +82,7 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
     try {
       if (paymentMethod === 'stripe') {
         // Stripe checkout
-        const res = await fetch('http://localhost:4000/api/payments/create-checkout', {
+        const res = await fetch('https://pullverse-backend.onrender.com/api/payments/create-checkout', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const [cartSnapshot, setCartSnapshot] = useState<CartItem[]>([])
 
       } else {
         // COD flow
-        const res = await fetch('http://localhost:4000/api/orders', {
+        const res = await fetch('https://pullverse-backend.onrender.com/api/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -51,7 +51,7 @@ export default function SearchPage() {
     if (q) { setQuery(q); setDebouncedQuery(q) }
     if (cat !== 'All') setCategory(cat)
 
-    fetch('http://localhost:4000/api/cards')
+    fetch('https://pullverse-backend.onrender.com/api/cards')
       .then(r => r.json())
       .then(data => {
         const withListings = data.filter((c: any) => c.listings?.length > 0)

@@ -42,7 +42,7 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/orders/my', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/orders/my', {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       const data = await res.json()
@@ -52,7 +52,7 @@ export default function OrdersPage() {
       const delivered = data.filter((o: any) => o.status === 'DELIVERED')
       const reviewed = new Set<string>()
       for (const order of delivered) {
-        const check = await fetch(`http://localhost:4000/api/reviews/check/${order.id}`, {
+        const check = await fetch(`https://pullverse-backend.onrender.com/api/reviews/check/${order.id}`, {
           headers: { 'Authorization': `Bearer ${getToken()}` }
         })
         const { canReview } = await check.json()
@@ -67,7 +67,7 @@ export default function OrdersPage() {
     setReviewLoading(true)
     try {
       const sellerId = order.items[0].listing.sellerId
-      const res = await fetch('http://localhost:4000/api/reviews', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

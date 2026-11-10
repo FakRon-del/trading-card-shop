@@ -41,7 +41,7 @@ export default function AccountPage() {
     const handleUpgrade = async () => {
     setUpgrading(true)
     try {
-      const res = await fetch('http://localhost:4000/api/seller/upgrade', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/seller/upgrade', {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       })
@@ -68,7 +68,7 @@ export default function AccountPage() {
     setDowngrading(true)
     setDowngradeError('')
     try {
-      const res = await fetch('http://localhost:4000/api/seller/downgrade', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/seller/downgrade', {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       })

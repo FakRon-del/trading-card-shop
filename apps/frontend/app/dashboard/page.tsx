@@ -55,14 +55,14 @@ export default function DashboardPage() {
 
   const fetchShop = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/seller/me', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/seller/me', {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       if (res.status === 404) { router.push('/dashboard/setup'); return }
       setShop(await res.json())
     } catch {} finally { setLoading(false) }
     // Fetch seller rating
-      const ratingRes = await fetch(`http://localhost:4000/api/reviews/seller/${data.id}`)
+      const ratingRes = await fetch(`https://pullverse-backend.onrender.com/api/reviews/seller/${data.id}`)
       const ratingData = await ratingRes.json()
       setRating({ average: ratingData.average, total: ratingData.total })
   }
@@ -73,7 +73,7 @@ export default function DashboardPage() {
     setAddLoading(true)
     setAddError('')
     try {
-      const res = await fetch('http://localhost:4000/api/seller/listings', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/seller/listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
         body: JSON.stringify({ ...form, price: parseFloat(form.price), stock: parseInt(form.stock) })
@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Remove this listing?')) return
-    const res = await fetch(`http://localhost:4000/api/seller/listings/${id}`, {
+    const res = await fetch(`https://pullverse-backend.onrender.com/api/seller/listings/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })

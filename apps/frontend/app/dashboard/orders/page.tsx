@@ -37,7 +37,7 @@ export default function SellerOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/orders/seller', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/orders/seller', {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       setOrders(await res.json())
@@ -47,7 +47,7 @@ export default function SellerOrdersPage() {
   const updateStatus = async (orderId: string, status: string) => {
     setUpdating(orderId)
     try {
-      await fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
+      await fetch(`https://pullverse-backend.onrender.com/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

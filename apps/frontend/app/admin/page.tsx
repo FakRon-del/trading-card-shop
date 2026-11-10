@@ -112,7 +112,7 @@ export default function AdminPage() {
   }, [])
 
   const api = (path: string, options?: RequestInit) =>
-    fetch(`http://localhost:4000/api${path}`, {
+    fetch(`https://pullverse-backend.onrender.com/api${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',

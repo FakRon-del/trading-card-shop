@@ -28,7 +28,7 @@ export default function ImageUpload({ value, onChange }: Props) {
       const formData = new FormData()
       formData.append('file', file)
 
-      const res = await fetch('http://localhost:4000/api/upload/card-image', {
+      const res = await fetch('https://pullverse-backend.onrender.com/api/upload/card-image', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getToken()}` },
         body: formData

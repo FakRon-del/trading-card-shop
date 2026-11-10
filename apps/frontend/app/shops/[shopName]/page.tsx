@@ -6,7 +6,7 @@ import StarRating from '../../components/StarRating'
 
 async function getShop(shopName: string) {
   try {
-    const res = await fetch(`http://localhost:4000/api/shops/${shopName}`, {
+    const res = await fetch(`https://pullverse-backend.onrender.com/api/shops/${shopName}`, {
       cache: 'no-store'
     })
     if (!res.ok) return null
@@ -16,7 +16,7 @@ async function getShop(shopName: string) {
 
 async function getReviews(sellerId: string) {
   try {
-    const res = await fetch(`http://localhost:4000/api/reviews/seller/${sellerId}`, {
+    const res = await fetch(`https://pullverse-backend.onrender.com/api/reviews/seller/${sellerId}`, {
       cache: 'no-store'
     })
     if (!res.ok) return { reviews: [], average: 0, total: 0 }
