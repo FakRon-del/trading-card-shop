@@ -16,7 +16,7 @@ dotenv.config()
 const server = Fastify({ logger: true })
 
 server.register(cors, {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://trading-card-shop.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 })
 server.register(helmet, { crossOriginResourcePolicy: false })
