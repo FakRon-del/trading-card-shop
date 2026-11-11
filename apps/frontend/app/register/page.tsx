@@ -9,12 +9,19 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [role, setRole] = useState<'BUYER' | 'SELLER'>('BUYER')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
     setLoading(true)
     setError('')
     try {
@@ -38,8 +45,6 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center px-4 py-8">
-
-      {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8">
         <img src="/logo.png" alt="Pullverse TCG" className="w-9 h-9 object-contain" />
         <span className="font-semibold text-gray-900 dark:text-white text-lg">
@@ -47,7 +52,13 @@ export default function RegisterPage() {
         </span>
       </Link>
 
-      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
+      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 relative">
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none"
+          aria-label="Go back"
+        >✕</button>
+
         <h1 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Create account</h1>
         <p className="text-xs text-gray-400 mb-5">Join Pullverse TCG — free forever</p>
 
@@ -76,14 +87,38 @@ export default function RegisterPage() {
           </div>
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Password</label>
-            <input
-              type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-              className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
-              placeholder="Min. 6 characters"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 pr-10 text-sm outline-none transition-colors"
+                placeholder="Min. 6 characters"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
+                {showPassword ? '🙈' : '👁'}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Confirm Password</label>
+            <div className="relative">
+              <input
+                type={showConfirm ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required
+                className={`w-full bg-gray-100 dark:bg-gray-800 border focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 pr-10 text-sm outline-none transition-colors ${
+                  confirmPassword && confirmPassword !== password ? 'border-red-400' : 'border-transparent'
+                }`}
+                placeholder="Re-enter password"
+              />
+              <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
+                {showConfirm ? '🙈' : '👁'}
+              </button>
+            </div>
+            {confirmPassword && confirmPassword !== password && (
+              <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+            )}
           </div>
 
-          {/* Role picker */}
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1.5">I want to...</label>
             <div className="grid grid-cols-2 gap-2">

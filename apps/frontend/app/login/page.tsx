@@ -8,6 +8,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -36,8 +37,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center px-4">
-
-      {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8">
         <img src="/logo.png" alt="Pullverse TCG" className="w-9 h-9 object-contain" />
         <span className="font-semibold text-gray-900 dark:text-white text-lg">
@@ -45,7 +44,13 @@ export default function LoginPage() {
         </span>
       </Link>
 
-      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
+      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 relative">
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none"
+          aria-label="Go back"
+        >✕</button>
+
         <h1 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Welcome back</h1>
         <p className="text-xs text-gray-400 mb-5">Sign in to your Pullverse TCG account</p>
 
@@ -66,11 +71,17 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Password</label>
-            <input
-              type="password" value={password} onChange={e => setPassword(e.target.value)} required
-              className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
+                className="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 pr-10 text-sm outline-none transition-colors"
+                placeholder="••••••••"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
+                {showPassword ? '🙈' : '👁'}
+              </button>
+            </div>
           </div>
           <button type="submit" disabled={loading}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-medium py-2.5 rounded-lg transition-colors text-sm mt-1">
