@@ -79,6 +79,7 @@ model Listing {
   updatedAt    DateTime     @updatedAt
   orderItems   OrderItem[]
   dealRooms    DealRoom[]
+  comments     Comment[]
 }
 
 enum Availability {
