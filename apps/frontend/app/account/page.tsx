@@ -207,8 +207,7 @@ export default function AccountPage() {
         {/* Navigation menu */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           {[
-            { href: '/orders',    label: 'My Orders',         sub: 'Track your purchases' },
-            { href: '/cart',      label: 'My Cart',           sub: 'Items ready to checkout' },
+            { href: '/deals', label: 'My Deals', sub: 'Your active deal rooms' },
             ...(user.role === 'SELLER' ? [
               { href: '/dashboard',         label: 'Seller Dashboard', sub: 'Manage your shop and listings' },
               { href: '/dashboard/orders',  label: 'Incoming Orders',  sub: 'Orders from buyers' },
