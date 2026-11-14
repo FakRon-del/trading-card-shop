@@ -79,7 +79,6 @@ model Listing {
   updatedAt    DateTime     @updatedAt
   orderItems   OrderItem[]
   dealRooms    DealRoom[]
-  dealRooms    DealRoom[]
 }
 
 enum Availability {
@@ -125,7 +124,6 @@ model OrderItem {
   orderId   String
   listing   Listing @relation(fields: [listingId], references: [id])
   listingId String
-  listing   Listing   @relation(fields: [listingId], references: [id])
   price     Decimal @db.Decimal(10, 2)
 }
 model Notification {
