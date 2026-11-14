@@ -11,6 +11,8 @@ import uploadRoutes from './routes/upload'
 import adminRoutes from './routes/admin'
 import reviewRoutes from './routes/reviews'
 import paymentRoutes from './routes/payments'
+import commentRoutes from './routes/comments'
+import dealRoutes from './routes/deals'
 dotenv.config()
 
 const server = Fastify({ logger: true })
@@ -40,6 +42,8 @@ server.register(uploadRoutes, { prefix: '/api' })
 server.register(adminRoutes, { prefix: '/api' })
 server.register(reviewRoutes, { prefix: '/api' })
 server.register(paymentRoutes, { prefix: '/api' })
+server.register(commentRoutes, { prefix: '/api' })
+server.register(dealRoutes, { prefix: '/api' })
 server.get('/health', async () => {
   return { status: 'ok', message: 'Trading Card API is running' }
 })

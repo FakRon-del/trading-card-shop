@@ -33,6 +33,7 @@ model Seller {
   shopName    String    @unique
   description String?
   avatar      String?
+  location    String?
   isVerified  Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -142,4 +143,42 @@ model Review {
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
+}
+model Comment {
+  id        String   @id @default(cuid())
+  listingId String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model DealRoom {
+  id        String     @id @default(cuid())
+  listingId String
+  buyerId   String
+  sellerId  String
+  status    DealStatus @default(PENDING)
+  meetupLat Float?
+  meetupLng Float?
+  meetupNote String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  messages  Message[]
+}
+
+enum DealStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  CANCELLED
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  dealRoomId String
+  senderId   String
+  content    String
+  createdAt  DateTime @default(now())
+  dealRoom   DealRoom @relation(fields: [dealRoomId], references: [id])
 }
