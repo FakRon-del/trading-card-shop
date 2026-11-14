@@ -116,7 +116,6 @@ export default function DealRoomPage() {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 py-4">
 
-        {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => router.back()} className="text-gray-400 hover:text-gray-600 text-lg">←</button>
           <div className="flex-1">
@@ -129,7 +128,6 @@ export default function DealRoomPage() {
           </div>
         </div>
 
-        {/* Listing preview */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 mb-4 flex items-center gap-3">
           {deal.listing?.card?.imageUrl && (
             <img src={deal.listing.card.imageUrl} alt="" className="w-12 h-16 object-contain rounded-lg bg-gray-100 dark:bg-gray-800" />
@@ -141,7 +139,6 @@ export default function DealRoomPage() {
           </div>
         </div>
 
-        {/* Seller: accept/decline if pending */}
         {isSeller && deal.status === 'PENDING' && (
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4">
             <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-3">
@@ -160,27 +157,23 @@ export default function DealRoomPage() {
           </div>
         )}
 
-        {/* Buyer: waiting if pending */}
         {isBuyer && deal.status === 'PENDING' && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4 text-center">
             <p className="text-sm text-blue-700 dark:text-blue-300">⏳ Waiting for seller to accept your deal request...</p>
           </div>
         )}
 
-        {/* Declined */}
         {deal.status === 'DECLINED' && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-4 text-center">
             <p className="text-sm text-red-600 dark:text-red-400">This deal was declined.</p>
           </div>
         )}
 
-        {/* Meetup location */}
         {deal.status === 'ACCEPTED' && (
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">📍 Meetup Location</p>
-              <button onClick={() => setShowMap(!showMap)}
-                className="text-xs text-blue-500 hover:text-blue-600">
+              <button onClick={() => setShowMap(!showMap)} className="text-xs text-blue-500 hover:text-blue-600">
                 {deal.meetupLat ? 'Update' : 'Set location'}
               </button>
             </div>
@@ -192,15 +185,10 @@ export default function DealRoomPage() {
             ) : (
               <p className="text-xs text-gray-400">No meetup location set yet.</p>
             )}
-            {showMap && (
-              <div className="mt-3">
-                <MapPicker onConfirm={handleSetMeetup} />
-              </div>
-            )}
+            {showMap && <div className="mt-3"><MapPicker onConfirm={handleSetMeetup} /></div>}
           </div>
         )}
 
-        {/* Chat */}
         {deal.status === 'ACCEPTED' && (
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div className="p-3 border-b border-gray-100 dark:border-gray-800">
