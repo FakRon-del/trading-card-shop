@@ -39,7 +39,7 @@ export default async function dealRoutes(fastify: FastifyInstance) {
     if (!user) return reply.status(401).send({ error: 'Unauthorized' })
     const deals = await prisma.dealRoom.findMany({
       where: { OR: [{ buyerId: user.userId }, { sellerId: user.userId }] },
-      include: { listing: { include: { card: true } }, messages: { orderBy: { createdAt: 'desc' }, take: 1 } },
+      include: { messages: { orderBy: { createdAt: 'desc' as const }, take: 1 } },
       orderBy: { updatedAt: 'desc' }
     })
     const userIds = [...new Set(deals.flatMap(d => [d.buyerId, d.sellerId]))]
